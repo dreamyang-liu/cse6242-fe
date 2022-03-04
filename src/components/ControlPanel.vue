@@ -1,5 +1,7 @@
 <template>
-  
+  <div class="control_panel">
+    <h1> This is the ControlPanel </h1>
+</div>
 </template>
 
 <script>
@@ -8,6 +10,10 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="less" scoped>
+.control_panel {
+  width: 30vw;
+  height: 45vh;
+  background: chartreuse;
+}
 </style>
