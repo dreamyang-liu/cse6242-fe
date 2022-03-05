@@ -1,4 +1,4 @@
-# new-analysis
+# CSE6242 group project Frontend
 
 ## Project setup
 ```
