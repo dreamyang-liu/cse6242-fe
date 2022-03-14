@@ -1,5 +1,5 @@
 {
-  "name": "new-analysis",
+  "name": "cse6242fe",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,8 +8,14 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "d3": "^5.0.0",
+    "deck.gl": "^8.7.0",
     "element-ui": "^2.15.6",
+    "h3-js": "^3.7.2",
+    "loader.mjs": "^0.0.2",
+    "mapbox-gl": "^2.7.0",
     "vue": "^2.6.11",
+    "vue-deck.gl": "^2.0.0",
     "vuex": "^3.4.0"
   },
   "devDependencies": {

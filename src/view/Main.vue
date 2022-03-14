@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="nav_bar">
-        <h1> This is the Navigation Bar </h1>
+        <!-- <h1> This is the Navigation Bar </h1> -->
     </div>
     <div class="main_container">
         <div class="select_map_container">
