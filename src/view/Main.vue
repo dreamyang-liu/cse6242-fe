@@ -10,7 +10,6 @@
         </div>
         <div class="stat_control_container">
             <GlobalStat />
-            <ControlPanel />
         </div>
     </div>
 </div>
@@ -20,7 +19,6 @@
 import Map from "../components/Map.vue";
 import GlobalStat from "../components/GlobalStat.vue";
 import Select from "../components/Select.vue";
-import ControlPanel from "../components/ControlPanel.vue";
 
 export default {
     name: 'Main',
@@ -28,7 +26,6 @@ export default {
         Map,
         GlobalStat,
         Select,
-        ControlPanel
     },
 }
 </script>
@@ -50,7 +47,7 @@ export default {
     flex-direction: column;
 }
 .stat_control_container {
-    width: 70vw;
+    width: 30vw;
     height: 90vh;
     display: flex;
     flex-direction: column;

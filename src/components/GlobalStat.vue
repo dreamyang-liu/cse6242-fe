@@ -28,7 +28,7 @@ export default {
 }
 .globa_stat {
   width: 30vw;
-  height: 45vh;
+  height: 90vh;
   background: cadetblue;
 }
 </style>

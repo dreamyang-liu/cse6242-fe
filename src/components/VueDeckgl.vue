@@ -107,13 +107,6 @@ export default {
             viewState,
           });
           this.$emit("view-state-change", viewState);
-          // if(this.map === null) return;
-          // this.map.jumpTo({
-          //   center: [viewState.longitude, viewState.latitude],
-          //   zoom: viewState.zoom,
-          //   bearing: viewState.bearing,
-          //   pitch: viewState.pitch
-          // });
         },
         // emit click events back to parent
         onClick: (info, event) => {
@@ -133,7 +126,33 @@ export default {
         },
         layers: layers,
         effects: this.effects,
-        getTooltip: ({object}) => object && `Total Population: ${object.totpop} \n White: ${(100*object.white/object.totpop).toFixed(2)}% \n Black: ${(100*object.black/object.totpop).toFixed(2)}% \n Native American: ${(100*object.hisp/object.totpop).toFixed(2)}% \n Asian: ${(100*object.asian/object.totpop).toFixed(2)}% \n Num of Census Blocks: ${object.count}`
+        getTooltip: (ele) => {
+          try {
+            if(ele.layer.id === "heatmap") {
+              let object = ele.object;
+              console.log(ele);
+              return object && {
+                text: `Total Population: ${object.totpop} \n White: ${(100*object.white/object.totpop).toFixed(2)}% \n Black: ${(100*object.black/object.totpop).toFixed(2)}% \n Native American: ${(100*object.hisp/object.totpop).toFixed(2)}% \n Asian: ${(100*object.asian/object.totpop).toFixed(2)}% \n Num of Census Blocks: ${object.count}`,
+                style: {
+                  position: "relative",
+                  fontSize: "12px",
+                  color: "#000",
+                  backgroundColor: "#efe",
+                  width: "200px",
+                  height: "100px",
+                  overflow: "scroll",
+                  marginLeft: "20px",
+                  marginTop: "20px",
+                  opacity: 0.75,
+                }
+              };
+            } else {
+              return "Scatter Layer";
+            }
+          } catch (e) {
+            return;
+          }
+        },
       });
     },
     handleContextMenu(e) {

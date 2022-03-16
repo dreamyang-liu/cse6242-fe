@@ -12,23 +12,27 @@
     >
     </VueDeckgl>
     <div id="map" ref="map"></div>
-    <div id="control-panel" class="control-panel">
-        <div>
-          <label>Coverage</label>
-          <input id="coverage" type="range" min="0" max="1" step="0.1" value="0.9" @change="update_layers"></input>
-          <span id="coverage-value"></span>
+    <el-popover
+      placement="right"
+      width="220"
+      trigger="click"
+      class="control-panel">
+      <!-- <div> -->
+        <div class="block">
+          <span class="demonstration">Coverage</span>
+          <el-slider style="width:200px;" v-model="coverage" :width="300" :min="0" :max="1" :step="0.01"></el-slider>
         </div>
-        <div>
-            <label>Opacity</label>
-            <input id="opacity" type="range" min="0" max="1" step="0.1" value="0.2" @change="update_layers"></input>
-            <span id="opacity-value"></span>    
-          </div>
+        <div class="block">
+          <span class="demonstration">Opacity</span>
+          <el-slider style="width:200px;" v-model="opacity" :width="300" :min="0" :max="1" :step="0.01"></el-slider>
+        </div>
           <div>
             <label for="color">Color Inversion</label>
             <input id="color" type="checkbox" name="color" @change="update_layers"></input>
             <span id="color-value"></span>    
           </div>   
-    </div>
+      <el-button slot="reference">Control Panel</el-button>
+    </el-popover>
 </div>
 </template>
 
@@ -73,10 +77,25 @@ export default {
             },
             layers: [],
             map: null,
+            activeNames: "",
+            coverage: 0.9,
+            opacity: 0.2,
         }
     },
+    watch: {
+        coverage(newVal, oldVal) {
+            this.update_layers();
+        },
+        opacity(newVal, oldVal) {
+            this.update_layers();
+        },
+    },
     methods: {
-      handleClick() {
+      handleChange(val) {
+        console.log(val);
+      },
+      handleClick(val) {
+        console.log(val);
       },
       handleViewStateChange(viewState) {
         this.viewState = {
@@ -92,12 +111,6 @@ export default {
       },
 
       update_layers() {
-        const options = {};
-        this.OPTIONS.forEach(key => {
-          let value = document.getElementById(key).value;
-          document.getElementById(key + '-value').innerHTML = value;
-          options[key] = Number(value);
-        });
         if (this.data === null) return [];
         let data = this.data;
         let hexagonLayer = new H3HexagonLayer({
@@ -115,7 +128,8 @@ export default {
             getFillColor: document.getElementById('color').checked
 
         },
-        ...options
+        coverage: this.coverage,
+        opacity: this.opacity,
       });
       
       let scatterplot = new ScatterplotLayer({
@@ -129,24 +143,27 @@ export default {
             getPosition: d => [d[0],d[1]],
             getFillColor: d => [0, 128, 255],
             pickable: true,
+            onHover: ({object, x, y}) => {
+              console.log(object);
+            },
        });
        
-      let iconlayer = new IconLayer({
-        id: 'icon-layer',
-        data: this.POIdata,
-        pickable: true,
-        // iconAtlas and iconMapping are required
-        // getIcon: return a string
-        iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-        iconMapping: this.ICON_MAPPING,
-        getIcon: d => 'marker',
+      // let iconlayer = new IconLayer({
+      //   id: 'icon-layer',
+      //   data: this.POIdata,
+      //   pickable: true,
+      //   // iconAtlas and iconMapping are required
+      //   // getIcon: return a string
+      //   iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+      //   iconMapping: this.ICON_MAPPING,
+      //   getIcon: d => 'marker',
 
-        sizeScale: 9,
-        getPosition: d => [d[0], d[1]],
-        getSize: d => 1,
-        getColor: d => [0, 128, 255]
-      });
-      this.layers = [hexagonLayer, scatterplot, iconlayer];
+      //   sizeScale: 9,
+      //   getPosition: d => [d[0], d[1]],
+      //   getSize: d => 1,
+      //   getColor: d => [0, 128, 255]
+      // });
+      this.layers = [hexagonLayer, scatterplot, ];
       },
       load_dummy_data() {
         d3.csv('./dummy_data.csv')
@@ -174,7 +191,7 @@ export default {
     const load_data = new Promise((resolve, reject) => {
       d3.csv('lat_lon_to_census_data.csv')
           .then(response => {
-          this.data = response.map(d => ({hex: h3.geoToH3(Number(d.lat), Number(d.lon), 8), lon: Number(d.lon), lat: Number(d.lat), totpop: Number(d.pop_total), white: Number(d.pop_white), black: Number(d.pop_black), hisp: Number(d.pop_indian_alaskan), asian: Number(d.pop_asian)}));
+          this.data = response.map(d => ({hex: h3.geoToH3(Number(d.lat), Number(d.lon), 9), lon: Number(d.lon), lat: Number(d.lat), totpop: Number(d.pop_total), white: Number(d.pop_white), black: Number(d.pop_black), hisp: Number(d.pop_indian_alaskan), asian: Number(d.pop_asian)}));
           // console.log(this.data);
           // Calculate the sums and group data (while tracking count)
           this.data = this.data.reduce(function(m, d){
@@ -243,10 +260,10 @@ export default {
   position: absolute;
   top: 23vh;
   left: 0;
-  margin: 12px;
-  padding: 20px;
   font-size: 12px;
+  margin-left: 3px;
   line-height: 1.5;
+  border-radius: 5px;
   z-index: 1;
   background: #fff;
   font-family: Helvetica, Arial, sans-serif;
