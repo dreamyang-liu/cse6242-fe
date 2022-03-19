@@ -92,10 +92,10 @@ export default {
     },
     methods: {
       handleChange(val) {
-        console.log(val);
+        // console.log(val);
       },
       handleClick(val) {
-        console.log(val);
+        // console.log(val);
       },
       handleViewStateChange(viewState) {
         this.viewState = {
@@ -144,7 +144,7 @@ export default {
             getFillColor: d => [0, 128, 255],
             pickable: true,
             onHover: ({object, x, y}) => {
-              console.log(object);
+              // console.log(object);
             },
        });
        
@@ -226,7 +226,7 @@ export default {
         });
     });
     load_data.then((s) => {
-      console.log(s);
+      // console.log(s);
       this.update_layers();
     });
     }

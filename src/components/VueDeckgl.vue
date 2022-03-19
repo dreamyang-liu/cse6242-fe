@@ -130,7 +130,7 @@ export default {
           try {
             if(ele.layer.id === "heatmap") {
               let object = ele.object;
-              console.log(ele);
+              // console.log(ele);
               return object && {
                 text: `Total Population: ${object.totpop} \n White: ${(100*object.white/object.totpop).toFixed(2)}% \n Black: ${(100*object.black/object.totpop).toFixed(2)}% \n Native American: ${(100*object.hisp/object.totpop).toFixed(2)}% \n Asian: ${(100*object.asian/object.totpop).toFixed(2)}% \n Num of Census Blocks: ${object.count}`,
                 style: {
@@ -200,7 +200,7 @@ export default {
   },
   mounted() {
     this.deck = this.initializeDeck(this.viewState, this.layers);
-    console.log(this.viewState);
+    // console.log(this.viewState);
     // this.map = new mapboxgl.Map({
     //           accessToken: 'pk.eyJ1Ijoic2VuZGF5byIsImEiOiJjams4MjdqOXAyZ2VrM3BydDRzeTR4cjBsIn0.Hk0FF4BvDNJZeDAZZiPlcg',
     //           container: this.$refs.map,
@@ -212,7 +212,7 @@ export default {
     //           bearing: 0,
     //           pitch: this.viewState.pitch
     //         });
-    console.log(this.deck);
+    // console.log(this.deck);
   },
   destroyed() {
     this.deck.finalize();
