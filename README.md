@@ -20,8 +20,8 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
 ## TODO
-- <input type="checkbox" /> Statistics Board
-- <input type="checkbox" /> Interface to fetch data from backend
-- <input type="checkbox" checked /> Map and hexgon layer
-- <input type="checkbox" /> Control panel with all options
-- <input type="checkbox" /> Compare page view
+- [ ] Statistics Board
+- [ ] Interface to fetch data from backend
+- [x] Map and hexgon layer
+- [ ] Control panel with all options
+- [ ] Compare page view
