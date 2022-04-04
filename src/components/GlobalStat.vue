@@ -19,6 +19,11 @@ export default {
             items: ["Housing", "Income", "Labor", "Poverty", "Unemployment", "Violence"],
         }
     },
+    methods: {
+        render(data) {
+          console.log(data);
+        }
+    }
 }
 </script>
 

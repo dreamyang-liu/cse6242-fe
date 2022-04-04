@@ -31,17 +31,24 @@ class FEProxy extends FEProxyBase {
         super();
     }
 
-    setCity(city, callback) {
-        console.log("setCity", city);
-    }
-
-    clickHexgon(hexgon, callback) {
-        console.log("clickHexgon", hexgon);
-    }
-
     init(callback) {
-        console.log("init");
+        proxy.get(`/init`, (response) => {
+            callback(response);
+        });
     }
+
+    configUpdate(data, callback) {
+        proxy.post(`/updateConfig`, data, (response) => {
+            callback(response);
+        });
+    }
+
+    poiUpdate(data, callback) {
+        proxy.post(`/updatePoi`, data, (response) => {
+            callback(response);
+        });
+    }
+
 };
 
 export default FEProxy;

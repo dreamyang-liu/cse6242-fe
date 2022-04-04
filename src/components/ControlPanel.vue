@@ -7,6 +7,11 @@
 <script>
 export default {
     name: "ControlPanel",
+    methods: {
+        render(data) {
+          console.log(data);
+        }
+    }
 }
 </script>
 

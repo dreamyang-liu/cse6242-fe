@@ -5,12 +5,16 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    current_city: '',
-    current_config: {},
-    compare_tuple: [],
-    current_vaccine_centers: [],
+    config: {},
+    pois: [],
   },
   mutations: {
+    SET_POIS(state, pois) {
+      state.pois = pois;
+    },
+    SET_CONFIG(state, config) {
+      state.config = config;
+    },
   },
   actions: {
   },

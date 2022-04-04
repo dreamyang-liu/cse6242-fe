@@ -19,6 +19,7 @@
 import Map from "../components/Map.vue";
 import GlobalStat from "../components/GlobalStat.vue";
 import Select from "../components/Select.vue";
+import FEProxy from "../utils/FEProxy";
 
 export default {
     name: 'Main',
@@ -26,6 +27,18 @@ export default {
         Map,
         GlobalStat,
         Select,
+    },
+    methods: {
+        render(data) {
+            console.log(data);
+        },
+        init() {
+            this.FEProxy.init(this.render);
+        },
+    },
+    mounted() {
+        this.FEProxy = new FEProxy();
+        this.init();
     },
 }
 </script>
