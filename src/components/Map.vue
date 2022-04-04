@@ -8,7 +8,7 @@
         @click="handleClick"
         @view-state-change="handleViewStateChange"
         width="70vw"
-        height="80vh"
+        height="85vh"
     >
     </VueDeckgl>
     <div id="map" ref="map"></div>
@@ -17,7 +17,6 @@
       width="220"
       trigger="click"
       class="control-panel">
-      <!-- <div> -->
         <div class="block">
           <span class="demonstration">Coverage</span>
           <el-slider style="width:200px;" v-model="coverage" :width="300" :min="0" :max="1" :step="0.01"></el-slider>
@@ -28,7 +27,7 @@
         </div>
           <div>
             <label for="color">Color Inversion</label>
-            <input id="color" type="checkbox" name="color" @change="update_layers"></input>
+            <input id="color" type="checkbox" name="color" @change="update_layers">
             <span id="color-value"></span>    
           </div>  
       <el-button slot="reference">Control Panel</el-button>
@@ -40,32 +39,21 @@
 import VueDeckgl from "./VueDeckgl";
 import { ScatterplotLayer, IconLayer } from '@deck.gl/layers';
 import {H3HexagonLayer} from '@deck.gl/geo-layers';
-import * as d3 from 'd3';
-import * as h3 from 'h3-js';
 import mapboxgl from 'mapbox-gl';
+import { mapState } from 'vuex';
 
 const MAP_STYLE = 'mapbox://styles/mapbox/streets-v11';
 
 export default {
     name: "Map",
     components: {
-        VueDeckgl
+      VueDeckgl
     },
     data() {
         return {
-            POIdata: {},
             ICON_MAPPING: {
               marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
             },
-            OPTIONS: ['coverage','opacity'],
-            COLOR_RANGE: [
-              //[1, 152, 189],
-              //[73, 227, 206],
-              //[216, 254, 181],
-              //[254, 237, 177],
-              //[254, 173, 84],
-              [209, 55, 78]
-            ],
             data: null,
             viewState: {
               longitude: -84.3880,
@@ -76,13 +64,19 @@ export default {
               pitch: 20
             },
             layers: [],
+            hexagonLayer: null,
+            scatterLayer: null,
             map: null,
-            activeNames: "",
             coverage: 0.9,
             opacity: 0.2,
             hex_set: new Set(),
         }
     },
+    computed: mapState({
+      cityData: state => state.cityData,
+      pois: state => state.pois,
+      clickEvent: state => state.clickEvent,
+    }),
     watch: {
         coverage(newVal, oldVal) {
             this.update_layers();
@@ -90,13 +84,68 @@ export default {
         opacity(newVal, oldVal) {
             this.update_layers();
         },
+        pois: {
+          handler(val) {
+            this.update_layers('scatter');
+          },
+          deep: true
+        },
+
+        cityData: {
+          handler(val) {
+            this.update_layers('hex');
+          },
+          deep: true
+        },
     },
     methods: {
-      handleChange(val) {
-        // console.log(val);
+      notify(title, message, success) {
+        if(success)
+          this.$notify({
+            title: title,
+            message: message,
+            duration: 4500,
+            type: 'success'
+          });
+        else
+          this.$notify.error({
+            title: title,
+            message: message,
+            duration: 4500,
+          });
+      },
+      handleClickChain(val) {
+        if(this.clickEvent === 0) {
+          if(val.info.layer.id === 'heatmap') {
+
+          } else {
+
+          }
+        } else this.handleAddPOI(val);
+      },
+      handleAddPOI(val) {
+        if(this.clickEvent === 1) {
+          if(val.info.layer.id === 'heatmap') {
+            this.notify("Add POI Succeed", "It may take a while to recalculate", true);
+          } else {
+            this.notify("Add POI Failed", "Cannot add POI on a existing POI", false);
+          }
+        } else {
+          this.handleRemovePOI(val);
+        }
+      },
+      handleRemovePOI(val) {
+        if(this.clickEvent === 2) {
+          if(val.info.layer.id === 'heatmap') {
+            this.notify("Remove POI Failed", "Cannot remove an unexisting POI", false);
+          } else {
+            this.notify("Remove POI Succeed", "It may take a while to recalculate", true);
+          }
+        } else 
+          throw new Error("Invalid clickEvent");
       },
       handleClick(val) {
-        // console.log(val);
+        this.handleClickChain(val);
       },
       handleViewStateChange(viewState) {
         this.viewState = {
@@ -111,24 +160,21 @@ export default {
         });
       },
 
-      handle_demographic(val){
+      handleDemographic(val){
         // on change for demographic data
 
       },
-      handle_poi(val){
-        // on change for poi data
-
-      },
-      handle_catchment(val){
+      handleCatchment(val){
         // on change for catchment data
         
       },
-
-      handleCityValues(city){
-        handle_demographic(city.demographic);
-        handle_poi(city.poi);
-        handle_catchment(city.catchment);
-
+      prepareCityData(){
+        // console.log(this.cityData);
+        // console.log(this.pois);
+        // let city = this.cityData;
+        // this.data = null;
+        // this.handleDemographic(city.demographic);
+        // this.handleCatchment(city.catchment);
       },
       handleHexSet(val){
         let hex_ids = val.map(d => d.hex_id);
@@ -136,127 +182,84 @@ export default {
         this.hex_set = hex_set;
       },
 
-      update_layers() {
-        if (this.data === null) return [];
-        let data = this.data;
-        this.handleHexSet([]); //TODO: add global variaable for POI hex_ids
+      createHexagonLayer() {
+        let data = this.cityData;
         let hexagonLayer = new H3HexagonLayer({
-        id: 'heatmap',
-        data,
-        elevationRange: [0, 0],
-        opacity: 0.2,
-        wireframe: false,
-        filled: true,
-        extruded: false,
-        pickable: true,
-        getHexagon: d=> d.hex,
-        getFillColor: d => {if(this.hex_set.has(d.hex)){ return [0,255,0]} else {return [255,0,0]}},
-        // getFillColor: d=> {if(document.getElementById('color').checked==true){return [0, (1-d.totpop/5000) * 255, 255]} else{ return [255, (1-d.totpop/5000) * 255, 0]}},
-        updateTriggers: {
-            getFillColor: document.getElementById('color').checked
-
-        },
-        coverage: this.coverage,
-        opacity: this.opacity,
-      });
-      
-      let scatterplot = new ScatterplotLayer({
-            id: 'scatter',
-            data: this.POIdata,
+          id: 'heatmap',
+          data,
+          elevationRange: [0, 0],
+          opacity: 0.2,
+          wireframe: false,
+          filled: true,
+          extruded: false,
+          pickable: true,
+          getHexagon: d=> d.hex,
+          getFillColor: d => {if(this.hex_set.has(d.hex)){ return [0,255,0]} else {return [255,0,0]}},
+          updateTriggers: {
+              getFillColor: document.getElementById('color').checked
+          },
+          coverage: this.coverage,
+          opacity: this.opacity,
+        });
+        return hexagonLayer ? hexagonLayer : null;
+      },
+      createScatterLayer() {
+        let scatterLayer = new ScatterplotLayer({
+            id: 'scatter-layer',
+            data: this.pois,
             opacity: 0.8,
             filled: true,
-            radiusMinPixels: 2,
-            radiusMaxPixels: 3,
-            //getRadius: d => 2,
+            radiusMinPixels: 4,
+            radiusMaxPixels: 4,
+            getRadius: d => 4,
             getPosition: d => [d[0],d[1]],
             getFillColor: d => [0, 128, 255],
             pickable: true,
             onHover: ({object, x, y}) => {
               // console.log(object);
             },
-       });
-       
-      // let iconlayer = new IconLayer({
-      //   id: 'icon-layer',
-      //   data: this.POIdata,
-      //   pickable: true,
-      //   // iconAtlas and iconMapping are required
-      //   // getIcon: return a string
-      //   iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-      //   iconMapping: this.ICON_MAPPING,
-      //   getIcon: d => 'marker',
-
-      //   sizeScale: 9,
-      //   getPosition: d => [d[0], d[1]],
-      //   getSize: d => 1,
-      //   getColor: d => [0, 128, 255]
-      // });
-      this.layers = [hexagonLayer, scatterplot, ];
-      },
-      load_dummy_data() {
-        d3.csv('./dummy_data.csv')
-          .then(response => {
-          this.POIdata = response.map(d => [Number(d.stop_lon), Number(d.stop_lat)]);
-          // console.log(this.POIdata);
         });
+        return scatterLayer ? scatterLayer : null;
       },
-        //
+      createIconLayer() {
+        let iconlayer = new IconLayer({
+            id: 'icon-layer',
+            data: this.pois,
+            pickable: true,
+            // iconAtlas and iconMapping are required
+            // getIcon: return a string
+            iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+            iconMapping: this.ICON_MAPPING,
+            getIcon: d => 'marker',
+
+            sizeScale: 9,
+            getPosition: d => [d[0], d[1]],
+            getSize: d => 1,
+            getColor: d => [0, 128, 255]
+          });
+        return iconlayer ? iconlayer : null;
+      },
+      update_layers(layer='all') {
+        this.prepareCityData();
+        this.handleHexSet([]); //TODO: add global variaable for POI hex_ids
+        if(layer === 'all' || layer === 'hex')
+        this.hexagonLayer = this.createHexagonLayer();
+        if(layer === 'all' || layer === 'scatter')
+        this.scatterLayer = this.createScatterLayer();
+        this.layers = [this.hexagonLayer, this.scatterLayer];
+      },
     },
     mounted() {
-    
-    this.load_dummy_data();
-    this.map = new mapboxgl.Map({
-      accessToken: 'pk.eyJ1Ijoic2VuZGF5byIsImEiOiJjams4MjdqOXAyZ2VrM3BydDRzeTR4cjBsIn0.Hk0FF4BvDNJZeDAZZiPlcg',
-      container: this.$refs.map,
-      style: MAP_STYLE,
-      // Note: deck.gl will be in charge of interaction and event handling
-      interactive: true,
-      center: [this.viewState.longitude, this.viewState.latitude],
-      zoom: this.viewState.zoom,
-      bearing: 0,
-      pitch: this.viewState.pitch
-    });
-    const load_data = new Promise((resolve, reject) => {
-      d3.csv('lat_lon_to_census_data.csv')
-          .then(response => {
-          this.data = response.map(d => ({hex: h3.geoToH3(Number(d.lat), Number(d.lon), 9), lon: Number(d.lon), lat: Number(d.lat), totpop: Number(d.pop_total), white: Number(d.pop_white), black: Number(d.pop_black), hisp: Number(d.pop_indian_alaskan), asian: Number(d.pop_asian)}));
-          // console.log(this.data);
-          // Calculate the sums and group data (while tracking count)
-          this.data = this.data.reduce(function(m, d){
-              if(!m[d.hex]){
-                  m[d.hex] = {...d, count: 1};
-                  return m;
-                }
-                m[d.hex].totpop += d.totpop;
-                m[d.hex].white += d.white;
-                m[d.hex].black += d.black;
-                m[d.hex].hisp += d.hisp;
-                m[d.hex].asian += d.asian;
-                m[d.hex].count += 1;
-                return m;
-            },{});
-            
-          // Create new array from grouped data and compute the average
-          let _this = this;
-          this.data = Object.keys(this.data).map(function(k){
-              let item  = _this.data[k];
-              return {
-                  hex: item.hex,
-                  totpop: item.totpop,
-                  count: item.count,
-                  white: item.white,
-                  black: item.black,
-                  hisp: item.hisp,
-                  asian: item.asian
-                }
-          })
-          resolve(this.data);
+      this.map = new mapboxgl.Map({
+          accessToken: 'pk.eyJ1Ijoic2VuZGF5byIsImEiOiJjams4MjdqOXAyZ2VrM3BydDRzeTR4cjBsIn0.Hk0FF4BvDNJZeDAZZiPlcg',
+          container: this.$refs.map,
+          style: MAP_STYLE,
+          interactive: true,
+          center: [this.viewState.longitude, this.viewState.latitude],
+          zoom: this.viewState.zoom,
+          bearing: 0,
+          pitch: this.viewState.pitch
         });
-    });
-    load_data.then((s) => {
-      // console.log(s);
-      this.update_layers();
-    });
     }
 }
 </script>
@@ -264,14 +267,14 @@ export default {
 <style lang="less" scoped>
 .map {
   width: 70vw;
-  height: 80vh;
+  height: 85vh;
   // background: cornflowerblue;
   #map {
       position: absolute;
-      top: 20vh;
+      top: 15vh;
       left: 0;
       width: 70vw;
-      height: 80vh;
+      height: 85vh;
       background: #e5e9ec;
       overflow: hidden;
       opacity: 1;
@@ -286,7 +289,7 @@ export default {
 }
 .control-panel {
   position: absolute;
-  top: 23vh;
+  top: 18vh;
   left: 0;
   font-size: 12px;
   margin-left: 3px;

@@ -6,15 +6,33 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     config: {},
-    pois: [],
+    pois: null,
+    cityData: {},
+    cityList: {},
+    clickEvent: 0,
   },
   mutations: {
-    SET_POIS(state, pois) {
+    setClickEvent(state, clickEvent) {
+      state.clickEvent = clickEvent
+    },
+    setPois(state, pois) {
       state.pois = pois;
     },
-    SET_CONFIG(state, config) {
+    setConfig(state, config) {
       state.config = config;
     },
+    setCityData(state, cityData) {
+      state.cityData = cityData;
+    },
+    setCityList(state, cityList) {
+      state.cityList = cityList;
+    },
+    setConfigPOIType(state, poiType) {
+      state.config.poiType = poiType;
+    },
+    setConfigCity(state, city) {
+      state.config.city = city;
+    }
   },
   actions: {
   },

@@ -20,6 +20,8 @@ import Map from "../components/Map.vue";
 import GlobalStat from "../components/GlobalStat.vue";
 import Select from "../components/Select.vue";
 import FEProxy from "../utils/FEProxy";
+import * as d3 from 'd3';
+import * as h3 from 'h3-js';
 
 export default {
     name: 'Main',
@@ -29,11 +31,56 @@ export default {
         Select,
     },
     methods: {
+        dummy_render(data) {
+            let _this = this;
+            const load_data = new Promise((resolve, reject) => {
+                d3.csv('./dummy_data.csv')
+                    .then(response => {
+                    let pois = response.map(d => [Number(d.stop_lon), Number(d.stop_lat)]);
+                    this.$store.commit("setPois", pois);
+                });
+                d3.csv('lat_lon_to_census_data.csv')
+                    .then(response => {
+                    let data = response.map(d => ({hex: h3.geoToH3(Number(d.lat), Number(d.lon), 9), lon: Number(d.lon), lat: Number(d.lat), totpop: Number(d.pop_total), white: Number(d.pop_white), black: Number(d.pop_black), hisp: Number(d.pop_indian_alaskan), asian: Number(d.pop_asian)}));
+                    // Calculate the sums and group data (while tracking count)
+                    data = data.reduce(function(m, d){
+                        if(!m[d.hex]){
+                            m[d.hex] = {...d, count: 1};
+                            return m;
+                        }
+                        m[d.hex].totpop += d.totpop;
+                        m[d.hex].white += d.white;
+                        m[d.hex].black += d.black;
+                        m[d.hex].hisp += d.hisp;
+                        m[d.hex].asian += d.asian;
+                        m[d.hex].count += 1;
+                        return m;
+                    },{});
+                    
+                    // Create new array from grouped data and compute the average
+                    let city_data = Object.keys(data).map(function(k){
+                        let item  = data[k];
+                        return {
+                            hex: item.hex,
+                            totpop: item.totpop,
+                            count: item.count,
+                            white: item.white,
+                            black: item.black,
+                            hisp: item.hisp,
+                            asian: item.asian
+                        }
+                    });
+                    this.$store.commit("setCityData", city_data);
+                });
+            });
+        },
         render(data) {
-            console.log(data);
+            let cityList = [{"value": 12, "label": "Atlanta"}]
+            this.$store.commit("setCityData", data.cityData);
+            this.$store.commit("setCityList", cityList);
         },
         init() {
-            this.FEProxy.init(this.render);
+            this.FEProxy.init(this.dummy_render);
         },
     },
     mounted() {

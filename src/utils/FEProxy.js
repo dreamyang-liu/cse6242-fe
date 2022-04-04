@@ -32,19 +32,19 @@ class FEProxy extends FEProxyBase {
     }
 
     init(callback) {
-        proxy.get(`/init`, (response) => {
+        this.get(`/init`, (response) => {
             callback(response);
         });
     }
 
     configUpdate(data, callback) {
-        proxy.post(`/updateConfig`, data, (response) => {
+        this.post(`/updateConfig`, data, (response) => {
             callback(response);
         });
     }
 
     poiUpdate(data, callback) {
-        proxy.post(`/updatePoi`, data, (response) => {
+        this.post(`/updatePoi`, data, (response) => {
             callback(response);
         });
     }
