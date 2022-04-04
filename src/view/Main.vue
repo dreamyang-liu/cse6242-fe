@@ -93,7 +93,7 @@ export default {
 <style lang="less" scoped>
 .nav_bar {
     width: 100vw;
-    height: 10vh;
+    height: 5vh;
     background: saddlebrown;
 }
 .main_container {
@@ -102,13 +102,13 @@ export default {
 }
 .select_map_container {
     width: 70vw;
-    height: 90vh;
+    height: 95vh;
     display: flex;
     flex-direction: column;
 }
 .stat_control_container {
     width: 30vw;
-    height: 90vh;
+    height: 95vh;
     display: flex;
     flex-direction: column;
 }

@@ -1,6 +1,7 @@
 <template>
   <div class="city_select">
-      <el-select v-model="value" placeholder="Select City">
+      <div style="padding-top:4px;">
+          <el-select v-model="value" placeholder="Select City">
         <el-option v-for="item in cityList" :key="item.value" :label="item.label" :value="item.value">
             {{ item.label }}
         </el-option>
@@ -13,10 +14,12 @@
       </el-select>
 
     <el-radio-group style="margin-left:20px;" v-model="radio">
-        <el-radio :label="0">Default</el-radio>
-        <el-radio :label="1">Add</el-radio>
-        <el-radio :label="2">Delete</el-radio>
+        <el-radio-button :label="0">Default</el-radio-button>
+        <el-radio-button :label="1">Add</el-radio-button>
+        <el-radio-button :label="2">Delete</el-radio-button>
+        
     </el-radio-group>
+      </div>
 
   </div>
 </template>
@@ -86,6 +89,8 @@ export default {
 .city_select {
   width: 70vw;
   height: 5vh;
-//   background: coral;
+  box-sizing: border-box;
+  border: 1px solid rgb(88, 26, 26);
+  background: linear-gradient(to right, rgb(6, 246, 242) 0%, rgb(6, 145, 219) 50%, rgb(67, 6, 182) 100%);
 }
 </style>

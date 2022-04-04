@@ -8,7 +8,7 @@
         @click="handleClick"
         @view-state-change="handleViewStateChange"
         width="70vw"
-        height="85vh"
+        height="90vh"
     >
     </VueDeckgl>
     <div id="map" ref="map"></div>
@@ -267,14 +267,16 @@ export default {
 <style lang="less" scoped>
 .map {
   width: 70vw;
-  height: 85vh;
+  height: 90vh;
+  box-sizing: border-box;
+  border: 1px solid rgb(110, 23, 23);
   // background: cornflowerblue;
   #map {
       position: absolute;
-      top: 15vh;
+      top: 10vh;
       left: 0;
       width: 70vw;
-      height: 85vh;
+      height: 90vh;
       background: #e5e9ec;
       overflow: hidden;
       opacity: 1;
@@ -289,7 +291,7 @@ export default {
 }
 .control-panel {
   position: absolute;
-  top: 18vh;
+  top: 13vh;
   left: 0;
   font-size: 12px;
   margin-left: 3px;
