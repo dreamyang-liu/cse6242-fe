@@ -30,7 +30,7 @@
             <label for="color">Color Inversion</label>
             <input id="color" type="checkbox" name="color" @change="update_layers"></input>
             <span id="color-value"></span>    
-          </div>   
+          </div>  
       <el-button slot="reference">Control Panel</el-button>
     </el-popover>
 </div>
@@ -80,6 +80,7 @@ export default {
             activeNames: "",
             coverage: 0.9,
             opacity: 0.2,
+            hex_set: new Set(),
         }
     },
     watch: {
@@ -110,9 +111,35 @@ export default {
         });
       },
 
+      handle_demographic(val){
+        // on change for demographic data
+
+      },
+      handle_poi(val){
+        // on change for poi data
+
+      },
+      handle_catchment(val){
+        // on change for catchment data
+        
+      },
+
+      handleCityValues(city){
+        handle_demographic(city.demographic);
+        handle_poi(city.poi);
+        handle_catchment(city.catchment);
+
+      },
+      handleHexSet(val){
+        let hex_ids = val.map(d => d.hex_id);
+        let hex_set = new Set(hex_ids);
+        this.hex_set = hex_set;
+      },
+
       update_layers() {
         if (this.data === null) return [];
         let data = this.data;
+        this.handleHexSet([]); //TODO: add global variaable for POI hex_ids
         let hexagonLayer = new H3HexagonLayer({
         id: 'heatmap',
         data,
@@ -123,7 +150,8 @@ export default {
         extruded: false,
         pickable: true,
         getHexagon: d=> d.hex,
-        getFillColor: d=> {if(document.getElementById('color').checked==true){return [0, (1-d.totpop/5000) * 255, 255]} else{ return [255, (1-d.totpop/5000) * 255, 0]}},
+        getFillColor: d => {if(this.hex_set.has(d.hex)){ return [0,255,0]} else {return [255,0,0]}},
+        // getFillColor: d=> {if(document.getElementById('color').checked==true){return [0, (1-d.totpop/5000) * 255, 255]} else{ return [255, (1-d.totpop/5000) * 255, 0]}},
         updateTriggers: {
             getFillColor: document.getElementById('color').checked
 

@@ -5,6 +5,13 @@
             {{ item.label }}
         </el-option>
       </el-select>
+
+      <el-select v-model="poi_type" placeholder="Select POI Type">
+        <el-option v-for="item in pois" :key="item.value" :label="item.label" :value="item.value">
+            {{ item.label }}
+        </el-option>
+      </el-select>
+
   </div>
 </template>
 
@@ -28,7 +35,30 @@ export default {
                     "label": "San Francisco",
                 }
             ],
+            pois: [
+                {
+                    "value": "grocery",
+                    "label": "Grocery Stores",
+                },
+                {
+                    "value": "vaccination",
+                    "label": "Vaccination Centers",
+                },
+                {
+                    "value": "schools",
+                    "label": "Schools",
+                },
+                {
+                    "value": "hospitals",
+                    "label": "Hospitals",
+                },
+                {
+                    "value": "polling",
+                    "label": "Polling Places",
+                }
+            ],
             value: '',
+            poi_type: '',
         }
     },
     methods: {
