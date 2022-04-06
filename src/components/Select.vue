@@ -1,5 +1,18 @@
 <template>
   <div class="city_select">
+      <el-button style="margin-right:50px;" type="primary" plain @click="dialogVisible = true">Methodology Details</el-button>
+
+        <el-dialog
+        title="Methodology"
+        :visible.sync="dialogVisible"
+        width="30%">
+        <span>This is the methodology of the tool</span>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="dialogVisible = false">Done</el-button>
+        </span>
+        </el-dialog>
+        
+
       <div style="padding: 1px 0;">
           <el-select v-model="value" placeholder="Select City">
         <el-option v-for="item in cityList" :key="item.value" :label="item.label" :value="item.value">
@@ -12,6 +25,27 @@
             <el-radio-button :label="1">Add</el-radio-button>
             <el-radio-button :label="2">Delete</el-radio-button>
         </el-radio-group>
+
+        
+
+<!-- <script>
+  export default {
+    data() {
+      return {
+        dialogVisible: false
+      };
+    },
+    methods: {
+      handleClose(done) {
+        this.$confirm('Are you sure to close this dialog?')
+          .then(_ => {
+            done();
+          })
+          .catch(_ => {});
+      }
+    }
+  };
+</script> -->
       </div>
 
   </div>
@@ -25,12 +59,20 @@ export default {
     data() {
         return {
             value: '',
-            radio: 0
+            radio: 0,
+            dialogVisible: false
         }
     },
     methods: {
         update_callback(cityData) {
             this.$store.commit("setCityData", cityData);
+        },
+        handleClose(done) {
+        this.$confirm('Are you sure you want to close this box?')
+          .then(_ => {
+            done();
+          })
+          .catch(_ => {});
         }
     },
     computed: mapState({
