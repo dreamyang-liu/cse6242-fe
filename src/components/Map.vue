@@ -14,22 +14,37 @@
     <div id="map" ref="map"></div>
     <el-popover
       placement="right"
-      width="220"
+      width="400"
       trigger="click"
       class="control-panel">
-        <div class="block">
-          <span class="demonstration">Coverage</span>
-          <el-slider style="width:200px;" v-model="coverage" :width="300" :min="0" :max="1" :step="0.01"></el-slider>
-        </div>
         <div class="block">
           <span class="demonstration">Opacity</span>
           <el-slider style="width:200px;" v-model="opacity" :width="300" :min="0" :max="1" :step="0.01"></el-slider>
         </div>
-          <div>
+        <!-- <el-select v-model="poi_type" style="margin-left:20px;" placeholder="Select POI Type">
+          <el-option v-for="item in pois" :key="item.value" :label="item.label" :value="item.value">
+              {{ item.label }}
+          </el-option>
+        </el-select> -->
+        <el-checkbox :indeterminate="isIndeterminate" v-model="check_all" @change="handleCheckAllChange">Check all</el-checkbox>
+        <el-checkbox-group v-model="checkedPOITypes" @change="handleCheckedPOIChange">
+          <el-checkbox v-for="item in poi_types" :label="item" :key="item">{{item}}</el-checkbox>
+        </el-checkbox-group>
+
+        <!-- <el-checkbox :indeterminate="isIndeterminate" v-model="check_all" @change="handleCheckAllChange">Check all</el-checkbox> -->
+        <el-checkbox-group v-model="checkDemographicTypes" @change="handleCheckedDemographicChange">
+          <el-checkbox v-for="item in demographic_types" :label="item" :key="item">{{item}}</el-checkbox>
+        </el-checkbox-group>
+
+        <!-- <el-checkbox :indeterminate="isIndeterminate" v-model="check_all" @change="handleCheckAllChange">Check all</el-checkbox> -->
+        <el-checkbox-group v-model="checkedTimeTypes" @change="handleCheckedTimeChange">
+          <el-checkbox v-for="item in time_of_day" :label="item" :key="item">{{item}}</el-checkbox>
+        </el-checkbox-group>
+          <!-- <div>
             <label for="color">Color Inversion</label>
             <input id="color" type="checkbox" name="color" @change="update_layers">
             <span id="color-value"></span>    
-          </div>  
+          </div>   -->
       <el-button slot="reference">Control Panel</el-button>
     </el-popover>
 </div>
@@ -49,12 +64,22 @@ export default {
     components: {
       VueDeckgl
     },
+    props: {
+      poi_types: {
+        type: Array,
+        require: true,
+      }
+    },
     data() {
         return {
             ICON_MAPPING: {
               marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
             },
+            checkedPOITypes: [],
+            checkDemographicTypes: [],
+            checkTimeTypes: [],
             data: null,
+
             viewState: {
               longitude: -84.3880,
               latitude: 33.7490,
@@ -67,20 +92,26 @@ export default {
             hexagonLayer: null,
             scatterLayer: null,
             map: null,
-            coverage: 0.9,
+            coverage: 0.7,
             opacity: 0.2,
             hex_set: new Set(),
+            check_all: false,
         }
     },
-    computed: mapState({
-      cityData: state => state.cityData,
-      pois: state => state.pois,
-      clickEvent: state => state.clickEvent,
-    }),
+    computed: {
+      isIndeterminatePOI() {
+        return this.checkedPOITypes.length > 0 && this.checkedPOITypes.length < this.poi_types.length;
+      },
+      checkAllPOI() {
+        return this.checkedPOITypes.length === this.poi_types.length;
+      },
+      ...mapState({
+        cityData: state => state.cityData,
+        pois: state => state.pois,
+        clickEvent: state => state.clickEvent,
+      })
+    },
     watch: {
-        coverage(newVal, oldVal) {
-            this.update_layers();
-        },
         opacity(newVal, oldVal) {
             this.update_layers();
         },
@@ -99,6 +130,25 @@ export default {
         },
     },
     methods: {
+      checkDemographicTypes() {
+
+      },
+      checkTimeTypes() {
+
+      },
+      handleCheckDemographicChange(val) {
+
+      },
+      handleCheckedDemographicChange(val) {
+
+      },
+
+      handleCheckAllPOIChange(val) {
+        this.checkedPOITypes = val ? this.poi_types.map((val) => { return val;}) : [];
+      },
+      handleCheckedPOIChange(value) {
+        this.check_all = this.checkAll;
+      },
       notify(title, message, success) {
         if(success)
           this.$notify({
@@ -115,13 +165,18 @@ export default {
           });
       },
       handleClickChain(val) {
-        if(this.clickEvent === 0) {
-          if(val.info.layer.id === 'heatmap') {
-
-          } else {
-
-          }
-        } else this.handleAddPOI(val);
+        try {
+          if(this.clickEvent === 0) {
+            if(val.info.layer.id === 'heatmap') {
+  
+            } else {
+  
+            }
+          } else this.handleAddPOI(val);
+        } catch (e) {
+          this.notify("Error", "No POI data found", false);
+          return;
+        }
       },
       handleAddPOI(val) {
         if(this.clickEvent === 1) {
@@ -169,8 +224,6 @@ export default {
         
       },
       prepareCityData(){
-        // console.log(this.cityData);
-        // console.log(this.pois);
         // let city = this.cityData;
         // this.data = null;
         // this.handleDemographic(city.demographic);
@@ -195,9 +248,9 @@ export default {
           pickable: true,
           getHexagon: d=> d.hex,
           getFillColor: d => {if(this.hex_set.has(d.hex)){ return [0,255,0]} else {return [255,0,0]}},
-          updateTriggers: {
-              getFillColor: document.getElementById('color').checked
-          },
+          // updateTriggers: {
+          //     getFillColor: document.getElementById('color').checked
+          // },
           coverage: this.coverage,
           opacity: this.opacity,
         });
@@ -268,9 +321,6 @@ export default {
 .map {
   width: 70vw;
   height: 90vh;
-  box-sizing: border-box;
-  border: 1px solid rgb(110, 23, 23);
-  // background: cornflowerblue;
   #map {
       position: absolute;
       top: 10vh;

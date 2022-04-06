@@ -31,21 +31,21 @@ class FEProxy extends FEProxyBase {
         super();
     }
 
+    fetchConfig(callback) {
+        this.get("/config", (response) => {
+            callback(JSON.parse(response));
+        });
+    }
+
     init(callback) {
         this.get(`/init`, (response) => {
-            callback(response);
+            callback(JSON.parse(response));
         });
     }
 
-    configUpdate(data, callback) {
-        this.post(`/updateConfig`, data, (response) => {
-            callback(response);
-        });
-    }
-
-    poiUpdate(data, callback) {
-        this.post(`/updatePoi`, data, (response) => {
-            callback(response);
+    fetchCatchement(callback) {
+        this.get(`/catchment`, (response) => {
+            callback(JSON.parse(response));
         });
     }
 

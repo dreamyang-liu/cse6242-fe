@@ -25,7 +25,7 @@
         :width="400"
         :height="300"
         />
-        <Doughnut
+        <DoughnutChart
         v-if="item == 'Doughnut'"
         :width="400"
         :height="300"
@@ -61,7 +61,7 @@ import BarChart from './charts/BarChart.vue';
 import Radar from './charts/Radar.vue';
 import LineChart from './charts/LineChart.vue';
 import Bubble from './charts/Bubble.vue';
-import Doughnut from './charts/Doughnut.vue';
+import DoughnutChart from './charts/Doughnut.vue';
 import PolarArea from './charts/PolarArea.vue';
 export default {
     name: "GlobalStat",
@@ -70,7 +70,7 @@ export default {
         Radar,
         LineChart,
         Bubble,
-        Doughnut,
+        DoughnutChart,
         PolarArea
     },
     data() {
@@ -93,6 +93,7 @@ export default {
 .stat_continer {
   display: flex;
   flex-direction: column;
+  align-items: center;
   .globa_stat {
     width: 30vw;
     height: 47.5vh;

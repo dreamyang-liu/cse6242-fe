@@ -6,7 +6,9 @@
     <div class="main_container">
         <div class="select_map_container">
             <Select />
-            <Map />
+            <Map 
+            :poi_types="poitypes"
+            />
         </div>
         <div class="stat_control_container">
             <GlobalStat />
@@ -30,7 +32,24 @@ export default {
         GlobalStat,
         Select,
     },
+    data: function() {
+        return {
+            poitypes: [],
+        }
+    },
     methods: {
+        configure(config) {
+            this.poitypes = config.poi_categories;
+            let cities = config.cities;
+            let parsed_cities = [];
+            for(let i=0; i < cities.length; i++) {
+                parsed_cities.push({
+                    "value": cities[i].id,
+                    "label": cities[i].name,
+                });
+            }
+            this.$store.commit("setCityList", parsed_cities);
+        },
         dummy_render(data) {
             let _this = this;
             const load_data = new Promise((resolve, reject) => {
@@ -75,12 +94,13 @@ export default {
             });
         },
         render(data) {
-            let cityList = [{"value": 12, "label": "Atlanta"}]
             this.$store.commit("setCityData", data.cityData);
-            this.$store.commit("setCityList", cityList);
+            
         },
         init() {
-            this.FEProxy.init(this.dummy_render);
+            // this.dummy_render();
+            // this.FEProxy.init(this.dummy_render);
+            this.FEProxy.fetchConfig(this.configure);
         },
     },
     mounted() {
