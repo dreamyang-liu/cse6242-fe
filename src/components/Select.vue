@@ -1,6 +1,6 @@
 <template>
   <div class="city_select">
-      <el-button style="margin-right:350px;" type="primary" plain @click="dialogVisible = true">Methodology Details</el-button>
+      <el-button style="margin-right:150px;" type="primary" plain @click="dialogVisible = true">Methodology Details</el-button>
 
         <el-dialog
         title="Methodology"
