@@ -8,6 +8,8 @@
             <Select />
             <Map 
             :poi_types="poitypes"
+            :demographic_types="demographictypes"
+            :time_types="time_types"
             />
         </div>
         <div class="stat_control_container">
@@ -35,11 +37,16 @@ export default {
     data: function() {
         return {
             poitypes: [],
+            demographictypes: [],
+            time_types: [],
         }
     },
     methods: {
         configure(config) {
+            console.log(config);
             this.poitypes = config.poi_categories;
+            this.demographictypes = config.demographic_categories;
+            this.time_types = config.times_of_day;
             let cities = config.cities;
             let parsed_cities = [];
             for(let i=0; i < cities.length; i++) {
@@ -94,13 +101,16 @@ export default {
             });
         },
         render(data) {
-            this.$store.commit("setCityData", data.cityData);
-            
+            this.$store.commit("setCityData", data);
+            this.$store.commit("setPois", data.pois.data);
         },
         init() {
             // this.dummy_render();
             // this.FEProxy.init(this.dummy_render);
             this.FEProxy.fetchConfig(this.configure);
+            this.FEProxy.init(this.render);
+            // this.dummy_render();
+            // 
         },
     },
     mounted() {

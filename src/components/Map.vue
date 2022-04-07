@@ -21,25 +21,26 @@
           <span class="demonstration">Opacity</span>
           <el-slider style="width:200px;" v-model="opacity" :width="300" :min="0" :max="1" :step="0.01"></el-slider>
         </div>
-        <!-- <el-select v-model="poi_type" style="margin-left:20px;" placeholder="Select POI Type">
-          <el-option v-for="item in pois" :key="item.value" :label="item.label" :value="item.value">
-              {{ item.label }}
-          </el-option>
-        </el-select> -->
-        <el-checkbox :indeterminate="isIndeterminate" v-model="check_all" @change="handleCheckAllChange">Check all</el-checkbox>
+        <el-divider></el-divider>
+        <p class="demonstration">POI Type</p>
+        <el-checkbox :indeterminate="isIndeterminatePOI" v-model="check_all_poi" @change="handleCheckAllPOIChange">Check all</el-checkbox>
         <el-checkbox-group v-model="checkedPOITypes" @change="handleCheckedPOIChange">
           <el-checkbox v-for="item in poi_types" :label="item" :key="item">{{item}}</el-checkbox>
         </el-checkbox-group>
+        <el-divider></el-divider>
 
-        <!-- <el-checkbox :indeterminate="isIndeterminate" v-model="check_all" @change="handleCheckAllChange">Check all</el-checkbox> -->
-        <el-checkbox-group v-model="checkDemographicTypes" @change="handleCheckedDemographicChange">
+        <!-- <el-checkbox-group v-model="checkedDemographicTypes" @change="handleCheckedDemographicChange">
           <el-checkbox v-for="item in demographic_types" :label="item" :key="item">{{item}}</el-checkbox>
-        </el-checkbox-group>
-
-        <!-- <el-checkbox :indeterminate="isIndeterminate" v-model="check_all" @change="handleCheckAllChange">Check all</el-checkbox> -->
-        <el-checkbox-group v-model="checkedTimeTypes" @change="handleCheckedTimeChange">
-          <el-checkbox v-for="item in time_of_day" :label="item" :key="item">{{item}}</el-checkbox>
-        </el-checkbox-group>
+        </el-checkbox-group> -->
+        <p class="demonstration">Demographic Groups</p>
+        <el-radio-group v-model="checkedDemographicTypes">
+          <el-radio v-for="item in demographic_types" :label="item" :key="item">{{item}}</el-radio>
+        </el-radio-group>
+        <el-divider></el-divider>
+        <p class="demonstration">Time of Day</p>
+        <el-radio-group v-model="time_of_day">
+          <el-radio-button v-for="item in time_types" :key="item">{{item}}</el-radio-button>
+        </el-radio-group>
           <!-- <div>
             <label for="color">Color Inversion</label>
             <input id="color" type="checkbox" name="color" @change="update_layers">
@@ -56,6 +57,8 @@ import { ScatterplotLayer, IconLayer } from '@deck.gl/layers';
 import {H3HexagonLayer} from '@deck.gl/geo-layers';
 import mapboxgl from 'mapbox-gl';
 import { mapState } from 'vuex';
+import FEProxy from '../utils/FEProxy';
+import * as h3 from 'h3-js';
 
 const MAP_STYLE = 'mapbox://styles/mapbox/streets-v11';
 
@@ -68,7 +71,15 @@ export default {
       poi_types: {
         type: Array,
         require: true,
-      }
+      },
+      demographic_types: {
+        type: Array,
+        require: true,
+      },
+      time_types: {
+        type: Array,
+        require: true,
+      },
     },
     data() {
         return {
@@ -76,7 +87,7 @@ export default {
               marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
             },
             checkedPOITypes: [],
-            checkDemographicTypes: [],
+            checkedDemographicTypes: '',
             checkTimeTypes: [],
             data: null,
 
@@ -92,10 +103,11 @@ export default {
             hexagonLayer: null,
             scatterLayer: null,
             map: null,
-            coverage: 0.7,
+            coverage: 1.0,
             opacity: 0.2,
             hex_set: new Set(),
-            check_all: false,
+            check_all_poi: false,
+            time_of_day: '',
         }
     },
     computed: {
@@ -130,24 +142,12 @@ export default {
         },
     },
     methods: {
-      checkDemographicTypes() {
-
-      },
-      checkTimeTypes() {
-
-      },
-      handleCheckDemographicChange(val) {
-
-      },
-      handleCheckedDemographicChange(val) {
-
-      },
 
       handleCheckAllPOIChange(val) {
         this.checkedPOITypes = val ? this.poi_types.map((val) => { return val;}) : [];
       },
       handleCheckedPOIChange(value) {
-        this.check_all = this.checkAll;
+        this.check_all_poi = this.checkAllPOI;
       },
       notify(title, message, success) {
         if(success)
@@ -164,13 +164,28 @@ export default {
             duration: 4500,
           });
       },
+      handleCatchment(val) {
+        function union(a, b) {
+          return new Set([...a, ...b]);
+        }
+        let coverage = JSON.parse(val);
+        let coordinates = coverage.geometry.coordinates.flat(2).map((coord) => {
+          return [coord[1], coord[0]];
+        });
+        let hexids = h3.polyfill(coordinates, 9);
+        console.log(hexids);
+        let hex_set = new Set(hexids);
+        this.hex_set = union(hex_set, this.hex_set);
+        this.update_layers('hex');
+      },
       handleClickChain(val) {
         try {
           if(this.clickEvent === 0) {
             if(val.info.layer.id === 'heatmap') {
-  
+              // nothing
             } else {
-  
+              let proxy = new FEProxy();
+              proxy.fetchCatchement(this.handleCatchment, val.info.object.id);
             }
           } else this.handleAddPOI(val);
         } catch (e) {
@@ -215,28 +230,8 @@ export default {
         });
       },
 
-      handleDemographic(val){
-        // on change for demographic data
-
-      },
-      handleCatchment(val){
-        // on change for catchment data
-        
-      },
-      prepareCityData(){
-        // let city = this.cityData;
-        // this.data = null;
-        // this.handleDemographic(city.demographic);
-        // this.handleCatchment(city.catchment);
-      },
-      handleHexSet(val){
-        let hex_ids = val.map(d => d.hex_id);
-        let hex_set = new Set(hex_ids);
-        this.hex_set = hex_set;
-      },
-
       createHexagonLayer() {
-        let data = this.cityData;
+        let data = this.cityData.demographics.data.filter(d => d.total > 80);
         let hexagonLayer = new H3HexagonLayer({
           id: 'heatmap',
           data,
@@ -246,8 +241,8 @@ export default {
           filled: true,
           extruded: false,
           pickable: true,
-          getHexagon: d=> d.hex,
-          getFillColor: d => {if(this.hex_set.has(d.hex)){ return [0,255,0]} else {return [255,0,0]}},
+          getHexagon: d=> d.h3id,
+          getFillColor: d => {if(this.hex_set.has(d.h3id)){ return [0,255,0]} else {return [255,0,0]}},
           // updateTriggers: {
           //     getFillColor: document.getElementById('color').checked
           // },
@@ -265,8 +260,10 @@ export default {
             radiusMinPixels: 4,
             radiusMaxPixels: 4,
             getRadius: d => 4,
-            getPosition: d => [d[0],d[1]],
-            getFillColor: d => [0, 128, 255],
+            getPosition: d => {
+              return [d.long, d.lat];
+            },
+            getFillColor: d => [0, 0, 255],
             pickable: true,
             onHover: ({object, x, y}) => {
               // console.log(object);
@@ -284,17 +281,14 @@ export default {
             iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
             iconMapping: this.ICON_MAPPING,
             getIcon: d => 'marker',
-
             sizeScale: 9,
-            getPosition: d => [d[0], d[1]],
-            getSize: d => 1,
+            getPosition: d => [d.long, d.lat],
+            getSize: d => 5,
             getColor: d => [0, 128, 255]
           });
         return iconlayer ? iconlayer : null;
       },
       update_layers(layer='all') {
-        this.prepareCityData();
-        this.handleHexSet([]); //TODO: add global variaable for POI hex_ids
         if(layer === 'all' || layer === 'hex')
         this.hexagonLayer = this.createHexagonLayer();
         if(layer === 'all' || layer === 'scatter')
@@ -333,7 +327,9 @@ export default {
       z-index: -100;
   }
 }
-
+.demonstration {
+  font-weight: bold;
+}
 .deck-map {
   width: 100%;
   height: 100%;

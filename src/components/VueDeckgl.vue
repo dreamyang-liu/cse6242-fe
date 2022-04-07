@@ -130,16 +130,20 @@ export default {
           try {
             if(ele.layer.id === "heatmap") {
               let object = ele.object;
-              // console.log(ele);
+              let texts = "";
+              for(let key in object.data) {
+                texts += `${key}: ${(100 * Number(object.data[key]) / object.total).toFixed(2)}%\n`;
+              }
               return object && {
-                text: `Total Population: ${object.totpop} \n White: ${(100*object.white/object.totpop).toFixed(2)}% \n Black: ${(100*object.black/object.totpop).toFixed(2)}% \n Native American: ${(100*object.hisp/object.totpop).toFixed(2)}% \n Asian: ${(100*object.asian/object.totpop).toFixed(2)}% \n Num of Census Blocks: ${object.count}`,
+                text: texts,
+                // text: `Total Population: ${object.totpop} \n White: ${(100*object.white/object.totpop).toFixed(2)}% \n Black: ${(100*object.black/object.totpop).toFixed(2)}% \n Native American: ${(100*object.hisp/object.totpop).toFixed(2)}% \n Asian: ${(100*object.asian/object.totpop).toFixed(2)}% \n Num of Census Blocks: ${object.count}`,
                 style: {
                   position: "relative",
                   fontSize: "12px",
                   color: "#000",
                   backgroundColor: "#efe",
-                  width: "200px",
-                  height: "100px",
+                  width: "260px",
+                  height: "135px",
                   overflow: "scroll",
                   marginLeft: "20px",
                   marginTop: "20px",

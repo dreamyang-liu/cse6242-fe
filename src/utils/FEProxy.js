@@ -1,10 +1,12 @@
+import config from "./default_config";
+import {UpdatePack} from "./UpdatePack";
 class FEProxyBase {
     constructor() {
         this.ajax = new XMLHttpRequest();
     }
     
     get(url, callback) {
-        this.ajax.open("GET", url);
+        this.ajax.open("GET", url, false);
         this.ajax.onreadystatechange = () => {
             if (this.ajax.readyState === 4 && this.ajax.status === 200) {
                 callback(this.ajax.responseText);
@@ -38,14 +40,25 @@ class FEProxy extends FEProxyBase {
     }
 
     init(callback) {
-        this.get(`/init`, (response) => {
+        let update_pack = new UpdatePack();  
+        update_pack.addChanged("poi_category");
+        update_pack.addChanged("demographic_category");
+        update_pack.addChanged("time_of_day");
+        console.log(update_pack.obj);
+        this.post(`/city_data/`, update_pack.obj, (response) => {
             callback(JSON.parse(response));
         });
     }
 
-    fetchCatchement(callback) {
-        this.get(`/catchment`, (response) => {
+    updateConfig(callback) {
+        this.get(`/city_data`, (response) => {
             callback(JSON.parse(response));
+        });
+    }
+
+    fetchCatchement(callback, id) {
+        this.get(`/catchment/${1}/${id}?time_of_day=${'morning'}&demographics_category=${'race'}`, (response) => {
+            callback(response);
         });
     }
 
