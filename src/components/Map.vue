@@ -35,7 +35,7 @@
           <el-checkbox v-for="item in demographic_types" :label="item" :key="item">{{item}}</el-checkbox>
         </el-checkbox-group> -->
         <p class="demonstration">Demographic Groups</p>
-        <el-cascader :options="options" v-model="checkedDemographicTypes"></el-cascader>
+        <el-cascader v-model="checkedDemographicTypes" :options="options"></el-cascader>
         <el-divider></el-divider>
         <p class="demonstration">Time of Day</p>
         <el-radio-group v-model="time_of_day">
@@ -88,7 +88,7 @@ export default {
               marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
             },
             checkedPOITypes: [],
-            checkedDemographicTypes: '',
+            checkedDemographicTypes: 'all',
             checkTimeTypes: [],
             data: null,
 
@@ -169,6 +169,7 @@ export default {
         },
         checkedDemographicTypes: {
           handler(val) {
+            console.log(val);
             this.update_layers('hex');
           },
           deep: true
@@ -211,7 +212,6 @@ export default {
           return [coord[1], coord[0]];
         });
         let hexids = h3.polyfill(coordinates, 9);
-        console.log(hexids);
         let hex_set = new Set(hexids);
         this.hex_set = union(hex_set, this.hex_set);
         this.update_layers('hex');
@@ -281,14 +281,15 @@ export default {
           pickable: true,
           getHexagon: d=> d.h3id,
           getFillColor: d => {
+            let factor = [600, 100, 100, 50, 50, 10];
             if(this.hex_set.has(d.h3id)) return [0,255,0];
 
-            if(this.checkedDemographicTypes=='all'){return [255,(d.total/600) * 255,0];}
-            if(this.checkedDemographicTypes=='white'){return [255,(d.data['White']/600) * 255,0];}
-            if(this.checkedDemographicTypes=='black'){return [255,(d.data['Black or African American']/600) * 255,0];}
-            if(this.checkedDemographicTypes=='asian'){return [255,(d.data['Asian']/600) * 255,0];}
-            if(this.checkedDemographicTypes=='native'){return [255,(d.data['American Indian and Alaska Native']/600) * 255,0];}
-            if(this.checkedDemographicTypes=='hawaiian'){return [255,(d.data['Native Hawaiian and Other Pacific Islander']/600) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('all') != -1){return [255,(d.total/factor[0]) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('white') != -1){return [255,(d.data['White']/factor[1]) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('black') != -1){return [255,(d.data['Black or African American']/factor[2]) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('asian') != -1){return [255,(d.data['Asian']/factor[3]) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('native') != -1){return [255,(d.data['American Indian and Alaska Native']/factor[4]) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('hawaiian') != -1){return [255,(d.data['Native Hawaiian and Other Pacific Islander']/factor[5]) * 255,0];}
             
           },
           // updateTriggers: {
