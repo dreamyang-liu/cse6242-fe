@@ -130,7 +130,7 @@ export default {
           try {
             if(ele.layer.id === "heatmap") {
               let object = ele.object;
-              let texts = "";
+              let texts = `Total Population: ${object.total.toFixed(0)}\n`;
               for(let key in object.data) {
                 texts += `${key}: ${(100 * Number(object.data[key]) / object.total).toFixed(2)}%\n`;
               }
@@ -143,7 +143,7 @@ export default {
                   color: "#000",
                   backgroundColor: "#efe",
                   width: "260px",
-                  height: "135px",
+                  height: "155px",
                   overflow: "scroll",
                   marginLeft: "20px",
                   marginTop: "20px",
@@ -151,7 +151,25 @@ export default {
                 }
               };
             } else {
-              return "Scatter Layer";
+              let object = ele.object;
+              let texts = `Category: ${object.category}\n`;
+              texts += `Name: ${object.name}\n`;
+              return object && {
+                text: texts,
+                // text: `Total Population: ${object.totpop} \n White: ${(100*object.white/object.totpop).toFixed(2)}% \n Black: ${(100*object.black/object.totpop).toFixed(2)}% \n Native American: ${(100*object.hisp/object.totpop).toFixed(2)}% \n Asian: ${(100*object.asian/object.totpop).toFixed(2)}% \n Num of Census Blocks: ${object.count}`,
+                style: {
+                  position: "relative",
+                  fontSize: "12px",
+                  color: "#000",
+                  backgroundColor: "#efe",
+                  width: "150px",
+                  height: "38px",
+                  overflow: "scroll",
+                  marginLeft: "20px",
+                  marginTop: "20px",
+                  opacity: 0.75,
+                }
+              };
             }
           } catch (e) {
             return;

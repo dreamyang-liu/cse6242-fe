@@ -58,14 +58,14 @@ export default {
     name: "Select",
     data() {
         return {
-            value: '',
+            value: 1,
             radio: 0,
             dialogVisible: false
         }
     },
     methods: {
         update_callback(cityData) {
-            this.$store.commit("setCityData", cityData);
+          this.$store.commit("setCityData", cityData);
         },
         handleClose(done) {
         this.$confirm('Are you sure you want to close this box?')

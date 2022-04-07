@@ -27,6 +27,8 @@
         <el-checkbox-group v-model="checkedPOITypes" @change="handleCheckedPOIChange">
           <el-checkbox v-for="item in poi_types" :label="item" :key="item">{{item}}</el-checkbox>
         </el-checkbox-group>
+        <br>
+        <el-button type="primary" icon="el-icon-delete" @click="clearCatchment">Clear Catchments</el-button>
         <el-divider></el-divider>
 
         <!-- <el-checkbox-group v-model="checkedDemographicTypes" @change="handleCheckedDemographicChange">
@@ -149,6 +151,11 @@ export default {
       handleCheckedPOIChange(value) {
         this.check_all_poi = this.checkAllPOI;
       },
+      clearCatchment() {
+        this.hex_set.clear();
+        this.update_layers('hex');
+        this.notify("Remove Catchments Succeed", "All catchment areas removed", true);
+      },
       notify(title, message, success) {
         if(success)
           this.$notify({
@@ -231,7 +238,7 @@ export default {
       },
 
       createHexagonLayer() {
-        let data = this.cityData.demographics.data.filter(d => d.total > 80);
+        let data = this.cityData.demographics.data.filter(d => d.total > 0);
         let hexagonLayer = new H3HexagonLayer({
           id: 'heatmap',
           data,
