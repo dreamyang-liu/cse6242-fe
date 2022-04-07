@@ -1,6 +1,6 @@
 <template>
   <div class="city_select">
-      <el-button style="margin-right:50px;" type="primary" plain @click="dialogVisible = true">Methodology Details</el-button>
+      <el-button style="margin-right:150px;" type="primary" plain @click="dialogVisible = true">Methodology Details</el-button>
 
         <el-dialog
         title="Methodology"
@@ -100,7 +100,7 @@ export default {
 <style lang="less" scoped>
 .city_select {
   width: 70vw;
-  height: 5vh;
+  height: 6vh;
   box-sizing: border-box;
   border: 1px solid rgb(88, 26, 26);
   background: linear-gradient(to right, rgb(6, 246, 242) 0%, rgb(6, 145, 219) 50%, rgb(67, 6, 182) 100%);

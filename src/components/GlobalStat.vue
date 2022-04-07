@@ -1,7 +1,7 @@
 <template>
   <div class="stat_continer">
     <div class="globa_stat">
-    <h3> City Level Stat </h3>
+    <h3> City Level Statistics </h3>
   <div class="block">
     <el-carousel trigger="click" height="35vh" :autoplay=false>
       <el-carousel-item v-for="item in items" :key="item">
@@ -41,7 +41,7 @@
   </div>
 
   <div class="globa_stat">
-    <h3> POI Stat </h3>
+    <h3> POI Statistics </h3>
   <div class="block">
     <el-carousel trigger="click" height="35vh" :autoplay=false>
       <el-carousel-item v-for="item in items" :key="item">
