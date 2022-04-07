@@ -35,9 +35,7 @@
           <el-checkbox v-for="item in demographic_types" :label="item" :key="item">{{item}}</el-checkbox>
         </el-checkbox-group> -->
         <p class="demonstration">Demographic Groups</p>
-        <el-radio-group v-model="checkedDemographicTypes">
-          <el-radio v-for="item in demographic_types" :label="item" :key="item">{{item}}</el-radio>
-        </el-radio-group>
+        <el-cascader :options="options" v-model="checkedDemographicTypes"></el-cascader>
         <el-divider></el-divider>
         <p class="demonstration">Time of Day</p>
         <el-radio-group v-model="time_of_day">
@@ -63,6 +61,7 @@ import FEProxy from '../utils/FEProxy';
 import * as h3 from 'h3-js';
 
 const MAP_STYLE = 'mapbox://styles/mapbox/streets-v11';
+
 
 export default {
     name: "Map",
@@ -110,6 +109,32 @@ export default {
             hex_set: new Set(),
             check_all_poi: false,
             time_of_day: '',
+            options: [
+            {
+              value: 'race',
+              label: 'Race',
+              children: [
+                {
+                  value: 'all',
+                  label: 'All',
+                },
+                {
+                  value: 'white',
+                  label: 'White',
+                },{
+                  value: 'black',
+                  label: 'Black',
+                },{
+                  value: 'asian',
+                  label: 'Asian',
+                },{
+                  value: 'native',
+                  label: 'American Indian and Native Alaskan',
+                },{
+                  value: 'hawaiian',
+                  label: 'Native Hawaiian and Other Pacific Islander',
+                }]
+            }],
         }
     },
     computed: {
@@ -137,6 +162,12 @@ export default {
         },
 
         cityData: {
+          handler(val) {
+            this.update_layers('hex');
+          },
+          deep: true
+        },
+        checkedDemographicTypes: {
           handler(val) {
             this.update_layers('hex');
           },
@@ -249,7 +280,17 @@ export default {
           extruded: false,
           pickable: true,
           getHexagon: d=> d.h3id,
-          getFillColor: d => {if(this.hex_set.has(d.h3id)){ return [0,255,0]} else {return [255,0,0]}},
+          getFillColor: d => {
+            if(this.hex_set.has(d.h3id)) return [0,255,0];
+
+            if(this.checkedDemographicTypes=='all'){return [255,(d.total/600) * 255,0];}
+            if(this.checkedDemographicTypes=='white'){return [255,(d.data['White']/600) * 255,0];}
+            if(this.checkedDemographicTypes=='black'){return [255,(d.data['Black or African American']/600) * 255,0];}
+            if(this.checkedDemographicTypes=='asian'){return [255,(d.data['Asian']/600) * 255,0];}
+            if(this.checkedDemographicTypes=='native'){return [255,(d.data['American Indian and Alaska Native']/600) * 255,0];}
+            if(this.checkedDemographicTypes=='hawaiian'){return [255,(d.data['Native Hawaiian and Other Pacific Islander']/600) * 255,0];}
+            
+          },
           // updateTriggers: {
           //     getFillColor: document.getElementById('color').checked
           // },
