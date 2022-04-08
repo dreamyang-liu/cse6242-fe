@@ -9,6 +9,7 @@
         v-if="item == 'Bar'"
         :width="400"
         :height="300"
+        :chartData="barChartData"
         />
         <Radar
         v-if="item == 'Radar'"
@@ -63,6 +64,9 @@ import LineChart from './charts/LineChart.vue';
 import Bubble from './charts/Bubble.vue';
 import DoughnutChart from './charts/Doughnut.vue';
 import PolarArea from './charts/PolarArea.vue';
+
+import { mapState } from 'vuex';
+
 export default {
     name: "GlobalStat",
     components: {
@@ -76,11 +80,30 @@ export default {
     data() {
         return {
             items: ["Bar", "Radar", "Line", "Bubble", "Doughnut", "PolarArea"],
+            barChartData: {}
         }
+    },
+    computed: {
+      ...mapState({
+        statistics: state => state.statistics
+      })
+    },
+    watch: {
+      statistics: {
+        handler(val) {
+          if(val === null) return;
+          this.render(val);
+        },
+        deep: true
+      }
     },
     methods: {
         render(data) {
           console.log(data);
+          this.barChartData = {
+            labels: [...Object.keys(data.index_detail)],
+            datasets: [ { data: [...Object.values(data.index_detail)] } ]
+          }
         }
     }
 }

@@ -23,10 +23,9 @@
         </div>
         <el-divider></el-divider>
         <p class="demonstration">POI Type</p>
-        <el-checkbox :indeterminate="isIndeterminatePOI" v-model="check_all_poi" @change="handleCheckAllPOIChange">Check all</el-checkbox>
-        <el-checkbox-group v-model="checkedPOITypes" @change="handleCheckedPOIChange">
-          <el-checkbox v-for="item in poi_types" :label="item" :key="item">{{item}}</el-checkbox>
-        </el-checkbox-group>
+        <el-radio-group v-model="checkedPOITypes">
+          <el-radio v-for="item in poi_types" :label="item" :key="item">{{item}}</el-radio>
+        </el-radio-group>
         <br>
         <el-button type="primary" icon="el-icon-delete" @click="clearCatchment">Clear Catchments</el-button>
         <el-divider></el-divider>
@@ -39,7 +38,7 @@
         <el-divider></el-divider>
         <p class="demonstration">Time of Day</p>
         <el-radio-group v-model="time_of_day">
-          <el-radio-button v-for="item in time_types" :key="item">{{item}}</el-radio-button>
+          <el-radio-button v-for="item in time_types" :label="item" :key="item">{{item}}</el-radio-button>
         </el-radio-group>
           <!-- <div>
             <label for="color">Color Inversion</label>
@@ -53,12 +52,13 @@
 
 <script>
 import VueDeckgl from "./VueDeckgl";
-import { ScatterplotLayer, IconLayer } from '@deck.gl/layers';
+import { ScatterplotLayer, IconLayer, PolygonLayer } from '@deck.gl/layers';
 import {H3HexagonLayer} from '@deck.gl/geo-layers';
 import mapboxgl from 'mapbox-gl';
 import { mapState } from 'vuex';
 import FEProxy from '../utils/FEProxy';
 import * as h3 from 'h3-js';
+import { UpdatePack } from '../utils/UpdatePack';
 
 const MAP_STYLE = 'mapbox://styles/mapbox/streets-v11';
 
@@ -87,8 +87,8 @@ export default {
             ICON_MAPPING: {
               marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
             },
-            checkedPOITypes: [],
-            checkedDemographicTypes: 'all',
+            checkedPOITypes: "Vaccination centre",
+            checkedDemographicTypes: ['race', 'all'],
             checkTimeTypes: [],
             data: null,
 
@@ -100,15 +100,17 @@ export default {
               maxZoom: 17,
               pitch: 20
             },
+            picked_poi_id: null,
             layers: [],
             hexagonLayer: null,
             scatterLayer: null,
+            iconLayer: null, 
+            polygonLayer: null,
             map: null,
             coverage: 1.0,
             opacity: 0.2,
             hex_set: new Set(),
-            check_all_poi: false,
-            time_of_day: '',
+            time_of_day: 'morning',
             options: [
             {
               value: 'race',
@@ -134,16 +136,27 @@ export default {
                   value: 'hawaiian',
                   label: 'Native Hawaiian and Other Pacific Islander',
                 }]
-            }],
+            },
+            {
+              value: 'age and sex',
+              label: 'Age and Sex'
+            },
+            {
+              value: 'income',
+              label: 'Income'
+            },
+            {
+              value: 'origin',
+              label: 'Origin'
+            },
+            {
+              value: 'vehicle availability',
+              label: 'Vehicle Availability'
+            }
+            ],
         }
     },
     computed: {
-      isIndeterminatePOI() {
-        return this.checkedPOITypes.length > 0 && this.checkedPOITypes.length < this.poi_types.length;
-      },
-      checkAllPOI() {
-        return this.checkedPOITypes.length === this.poi_types.length;
-      },
       ...mapState({
         cityData: state => state.cityData,
         pois: state => state.pois,
@@ -169,22 +182,44 @@ export default {
         },
         checkedDemographicTypes: {
           handler(val) {
-            console.log(val);
-            this.update_layers('hex');
+            this.$store.commit('setConfigDemographicType', val[0]);
+            if(val[0] === this.$store.state.config.demographic_category) return;
+            this.commit_config_change("demographic_category");
+          },
+          deep: true
+        },
+        time_of_day: {
+          handler(val) {
+            this.$store.commit('setConfigTimeofDay', val);
+            this.commit_config_change("time_of_day");
+          },
+          deep: true
+        },
+        checkedPOITypes: {
+          handler(val) {
+            this.$store.commit('setConfigPOIType', val);
+            this.commit_config_change("poi_category");
           },
           deep: true
         },
     },
     methods: {
-
-      handleCheckAllPOIChange(val) {
-        this.checkedPOITypes = val ? this.poi_types.map((val) => { return val;}) : [];
-      },
-      handleCheckedPOIChange(value) {
-        this.check_all_poi = this.checkAllPOI;
+      commit_config_change(change_field) {
+        let update_pack = new UpdatePack();
+        update_pack.add_change(change_field);
+        update_pack.fill_config(this.$store.state.config);
+        let proxy = new FEProxy();
+        proxy.updateConfig((data)=> {
+          this.$store.commit("setStatistics", data.stats);
+          this.$store.commit("setPois", data.pois.data);
+        }
+        , update_pack);
       },
       clearCatchment() {
-        this.hex_set.clear();
+        if(this.polygonLayer === null) return;
+        this.picked_poi_id = null;
+        this.polygonLayer = null;
+        this.update_layers('scatter');
         this.update_layers('hex');
         this.notify("Remove Catchments Succeed", "All catchment areas removed", true);
       },
@@ -204,26 +239,20 @@ export default {
           });
       },
       handleCatchment(val) {
-        function union(a, b) {
-          return new Set([...a, ...b]);
-        }
         let coverage = JSON.parse(val);
-        let coordinates = coverage.geometry.coordinates.flat(2).map((coord) => {
-          return [coord[1], coord[0]];
-        });
-        let hexids = h3.polyfill(coordinates, 9);
-        let hex_set = new Set(hexids);
-        this.hex_set = union(hex_set, this.hex_set);
-        this.update_layers('hex');
+        let coordinates = coverage.geometry.coordinates;
+        this.update_layers('polygon', coordinates);
       },
       handleClickChain(val) {
         try {
           if(this.clickEvent === 0) {
             if(val.info.layer.id === 'heatmap') {
-              // nothing
+              this.clearCatchment();
             } else {
+              this.picked_poi_id = val.info.object.id;
+              this.update_layers('scatter');
               let proxy = new FEProxy();
-              proxy.fetchCatchement(this.handleCatchment, val.info.object.id);
+              proxy.fetchCatchement(this.handleCatchment, val.info.object.id, this.time_of_day, this.checkedDemographicTypes);
             }
           } else this.handleAddPOI(val);
         } catch (e) {
@@ -267,7 +296,25 @@ export default {
           pitch: viewState.pitch
         });
       },
-
+      createPolyonLayer(catchment) {
+        let data = catchment;
+        let layer = new PolygonLayer({
+            id: 'polygon-layer',
+            data,
+            pickable: true,
+            stroked: true,
+            filled: true,
+            wireframe: true,
+            lineWidthMinPixels: 1,
+            getPolygon: d => d,
+            opacity: 0.5,
+            // getElevation: d => d.population / d.area / 10,
+            getFillColor: d => [ 60, 140, 0],
+            getLineColor: [80, 80, 80],
+            getLineWidth: 1
+          });
+        return layer;
+      },
       createHexagonLayer() {
         let data = this.cityData.demographics.data.filter(d => d.total > 0);
         let hexagonLayer = new H3HexagonLayer({
@@ -284,12 +331,12 @@ export default {
             let factor = [600, 100, 100, 50, 50, 10];
             if(this.hex_set.has(d.h3id)) return [0,255,0];
 
-            if(this.checkedDemographicTypes.indexOf('all') != -1){return [255,(d.total/factor[0]) * 255,0];}
             if(this.checkedDemographicTypes.indexOf('white') != -1){return [255,(d.data['White']/factor[1]) * 255,0];}
             if(this.checkedDemographicTypes.indexOf('black') != -1){return [255,(d.data['Black or African American']/factor[2]) * 255,0];}
             if(this.checkedDemographicTypes.indexOf('asian') != -1){return [255,(d.data['Asian']/factor[3]) * 255,0];}
             if(this.checkedDemographicTypes.indexOf('native') != -1){return [255,(d.data['American Indian and Alaska Native']/factor[4]) * 255,0];}
             if(this.checkedDemographicTypes.indexOf('hawaiian') != -1){return [255,(d.data['Native Hawaiian and Other Pacific Islander']/factor[5]) * 255,0];}
+            return [255,(d.total/factor[0]) * 255,0];
             
           },
           // updateTriggers: {
@@ -301,6 +348,7 @@ export default {
         return hexagonLayer ? hexagonLayer : null;
       },
       createScatterLayer() {
+        console.log("Redrawing the layer of Scatter...");
         let scatterLayer = new ScatterplotLayer({
             id: 'scatter-layer',
             data: this.pois,
@@ -312,7 +360,14 @@ export default {
             getPosition: d => {
               return [d.long, d.lat];
             },
-            getFillColor: d => [0, 0, 255],
+            getFillColor: d => {
+              if(this.picked_poi_id === d.id) return [0,255,255];
+              return [140,0,0];
+            },
+            updateTriggers: {
+              // This tells deck.gl to recalculate radius when `currentYear` changes
+              getFillColor: this.picked_poi_id
+            },
             pickable: true,
             onHover: ({object, x, y}) => {
               // console.log(object);
@@ -337,12 +392,16 @@ export default {
           });
         return iconlayer ? iconlayer : null;
       },
-      update_layers(layer='all') {
+      update_layers(layer='all', payload=null) {
         if(layer === 'all' || layer === 'hex')
         this.hexagonLayer = this.createHexagonLayer();
         if(layer === 'all' || layer === 'scatter')
         this.scatterLayer = this.createScatterLayer();
-        this.layers = [this.hexagonLayer, this.scatterLayer];
+        if(layer === 'all' || layer === 'icon')
+        this.iconLayer = this.createIconLayer();
+        if(layer === 'all' || layer === 'polygon')
+        this.polygonLayer = this.createPolyonLayer(payload);
+        this.layers = [this.hexagonLayer, this.scatterLayer, this.iconLayer, this.polygonLayer];
       },
     },
     mounted() {

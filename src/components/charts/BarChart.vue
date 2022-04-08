@@ -50,14 +50,19 @@ export default {
     plugins: {
       type: Object,
       default: () => {}
-    }
+    },
+    chartData: {
+      type: Object,
+      default: () => {
+        return {
+            labels: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July' ],
+            datasets: [ { data: [40, 20, 12, 15, 18, 30, 24] } ]
+          }
+      }
+    },
   },
   data() {
     return {
-      chartData: {
-        labels: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July' ],
-        datasets: [ { data: [40, 20, 12, 15, 18, 30, 24] } ]
-      },
       chartOptions: {
         responsive: true
       }

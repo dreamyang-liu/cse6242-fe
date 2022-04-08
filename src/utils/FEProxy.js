@@ -41,23 +41,28 @@ class FEProxy extends FEProxyBase {
 
     init(callback) {
         let update_pack = new UpdatePack();  
-        update_pack.addChanged("poi_category");
-        update_pack.addChanged("demographic_category");
-        update_pack.addChanged("time_of_day");
-        console.log(update_pack.obj);
+        update_pack.add_change("poi_category");
+        update_pack.add_change("demographic_category");
+        update_pack.add_change("time_of_day");
         this.post(`/city_data/`, update_pack.obj, (response) => {
             callback(JSON.parse(response));
         });
     }
 
-    updateConfig(callback) {
-        this.get(`/city_data`, (response) => {
+    updateConfig(callback, payload) {
+        this.post(`/city_data/`, payload.obj, (response) => {
             callback(JSON.parse(response));
         });
     }
 
-    fetchCatchement(callback, id) {
-        this.get(`/catchment/${1}/${id}?time_of_day=${'morning'}&demographics_category=${'race'}`, (response) => {
+    // updateConfig(callback) {
+    //     this.get(`/city_data`, (response) => {
+    //         callback(JSON.parse(response));
+    //     });
+    // }
+
+    fetchCatchement(callback, id, time, demographic) {
+        this.get(`/catchment/${1}/${id}?time_of_day=${time}&demographics_category=${demographic}`, (response) => {
             callback(response);
         });
     }

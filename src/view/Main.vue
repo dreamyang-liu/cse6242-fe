@@ -103,6 +103,7 @@ export default {
         render(data) {
             this.$store.commit("setCityData", data);
             this.$store.commit("setPois", data.pois.data);
+            this.$store.commit("setStatistics", data.stats);
         },
         init() {
             // this.dummy_render();

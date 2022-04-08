@@ -4,7 +4,7 @@ class UpdatePack {
             "changed": [
             ],
             "config": {
-              "poi_category": "Restaurants",
+              "poi_category": "Vaccination centre",
               "demographic_category": "Race",
               "time_of_day": "morning",
               "city_id": 1
@@ -13,7 +13,7 @@ class UpdatePack {
           }
     }
 
-    addChanged(field) {
+    add_change(field) {
         if(this.obj.changed.indexOf(field) === -1) {
             this.obj.changed.push(field);
         }
