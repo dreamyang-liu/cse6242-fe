@@ -9,6 +9,7 @@
         @view-state-change="handleViewStateChange"
         width="70vw"
         height="90vh"
+        ref="deckgl"
     >
     </VueDeckgl>
     <div id="map" ref="map"></div>
@@ -59,7 +60,7 @@ import { mapState } from 'vuex';
 import FEProxy from '../utils/FEProxy';
 import * as h3 from 'h3-js';
 import { UpdatePack } from '../utils/UpdatePack';
-
+// import structuredClone from '@ungap/structured-clone';
 const MAP_STYLE = 'mapbox://styles/mapbox/streets-v11';
 
 
@@ -111,6 +112,7 @@ export default {
             opacity: 0.2,
             hex_set: new Set(),
             time_of_day: 'morning',
+            addedPois: [],
             options: [
             {
               value: 'race',
@@ -165,7 +167,7 @@ export default {
     },
     watch: {
         opacity(newVal, oldVal) {
-            this.update_layers();
+            this.update_layers('hex');
         },
         pois: {
           handler(val) {
@@ -173,7 +175,12 @@ export default {
           },
           deep: true
         },
-
+        addedPois: {
+          handler(val) {
+            console.log(val);
+            this.update_layers('scatter');
+          }
+        },
         cityData: {
           handler(val) {
             this.update_layers('hex');
@@ -220,7 +227,6 @@ export default {
         this.picked_poi_id = null;
         this.polygonLayer = null;
         this.update_layers('scatter');
-        this.update_layers('hex');
         this.notify("Remove Catchments Succeed", "All catchment areas removed", true);
       },
       notify(title, message, success) {
@@ -256,13 +262,17 @@ export default {
             }
           } else this.handleAddPOI(val);
         } catch (e) {
-          this.notify("Error", "No POI data found", false);
+          this.notify("Error", "No POI data found or " + e, false);
           return;
         }
       },
       handleAddPOI(val) {
         if(this.clickEvent === 1) {
+          console.log(val);
           if(val.info.layer.id === 'heatmap') {
+            let new_poi = {'long': val.info.coordinate[0], 'lat': val.info.coordinate[1], 'name':'wqdwadw','h3id':'d12rdwad','id':-1,'category':'asd','coords':{'lat':val.info.coordinate[1],'long':val.info.coordinate[0]}};
+            // this.$store.commit("addPoi", new_poi);
+            this.addedPois.push(new_poi);
             this.notify("Add POI Succeed", "It may take a while to recalculate", true);
           } else {
             this.notify("Add POI Failed", "Cannot add POI on a existing POI", false);
@@ -276,6 +286,7 @@ export default {
           if(val.info.layer.id === 'heatmap') {
             this.notify("Remove POI Failed", "Cannot remove an unexisting POI", false);
           } else {
+            this.$store.commit("deletePoi", val.info.object.id);
             this.notify("Remove POI Succeed", "It may take a while to recalculate", true);
           }
         } else 
@@ -349,31 +360,31 @@ export default {
       },
       createScatterLayer() {
         console.log("Redrawing the layer of Scatter...");
-        let scatterLayer = new ScatterplotLayer({
-            id: 'scatter-layer',
-            data: this.pois,
-            opacity: 0.8,
-            filled: true,
-            radiusMinPixels: 4,
-            radiusMaxPixels: 4,
-            getRadius: d => 4,
-            getPosition: d => {
-              return [d.long, d.lat];
-            },
-            getFillColor: d => {
+        let layer = new ScatterplotLayer({
+          id: 'scatterplot-layer',
+          data: [...this.pois, ...this.addedPois],
+          pickable: true,
+          opacity: 0.8,
+          stroked: true,
+          filled: true,
+          radiusScale: 6,
+          radiusMinPixels: 5,
+          radiusMaxPixels: 3,
+          lineWidthMinPixels: 1,
+          getPosition:d => {
+            return [d.long, d.lat];
+          },
+          getRadius: d => 4,
+          getFillColor: d => {
               if(this.picked_poi_id === d.id) return [0,255,255];
               return [140,0,0];
-            },
-            updateTriggers: {
-              // This tells deck.gl to recalculate radius when `currentYear` changes
-              getFillColor: this.picked_poi_id
-            },
-            pickable: true,
-            onHover: ({object, x, y}) => {
-              // console.log(object);
-            },
+          },
+          updateTriggers: {
+            getFillColor: this.picked_poi_id,
+          },
+          getLineColor: d => [0, 0, 0],
         });
-        return scatterLayer ? scatterLayer : null;
+        return layer ? layer : null;
       },
       createIconLayer() {
         let iconlayer = new IconLayer({
@@ -393,15 +404,14 @@ export default {
         return iconlayer ? iconlayer : null;
       },
       update_layers(layer='all', payload=null) {
-        if(layer === 'all' || layer === 'hex')
-        this.hexagonLayer = this.createHexagonLayer();
-        if(layer === 'all' || layer === 'scatter')
-        this.scatterLayer = this.createScatterLayer();
-        if(layer === 'all' || layer === 'icon')
-        this.iconLayer = this.createIconLayer();
-        if(layer === 'all' || layer === 'polygon')
-        this.polygonLayer = this.createPolyonLayer(payload);
-        this.layers = [this.hexagonLayer, this.scatterLayer, this.iconLayer, this.polygonLayer];
+        if(layer === 'all' || layer === 'hex') this.hexagonLayer = this.createHexagonLayer();
+        if(layer === 'all' || layer === 'scatter') {
+          this.scatterLayer = this.createScatterLayer();
+        }
+        if(layer === 'all' || layer === 'polygon') this.polygonLayer = this.createPolyonLayer(payload);
+        this.$refs['deckgl'].deck.setProps({
+          layers: [this.hexagonLayer, this.scatterLayer, this.polygonLayer]
+        });
       },
     },
     mounted() {

@@ -24,6 +24,12 @@ export default new Vuex.Store({
     setPois(state, pois) {
       state.pois = pois;
     },
+    addPoi(state, poi) {
+      state.pois.push(poi); 
+    }, 
+    deletePoi(state, id) {
+      state.pois = state.pois.filter(poi => poi.id !== id);
+    },
     setConfig(state, config) {
       state.config = config;
     },
