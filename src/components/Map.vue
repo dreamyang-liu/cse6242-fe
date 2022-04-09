@@ -234,6 +234,11 @@ export default {
       handleAddPOI(val) {
         if(this.clickEvent === 1) {
           if(val.info.layer.id === 'heatmap') {
+            var newpois = this.pois;
+            console.log(newpois);
+            newpois.push({'long': val.info.coordinate[0], 'lat': val.info.coordinate[1], 'name':'','h3id':'','id':'','category':'','coords':{'lat':'','long':''}});
+            this.$store.commit("addPoi", newpois);
+            this.update_layers('scatter');
             this.notify("Add POI Succeed", "It may take a while to recalculate", true);
           } else {
             this.notify("Add POI Failed", "Cannot add POI on a existing POI", false);
@@ -247,6 +252,8 @@ export default {
           if(val.info.layer.id === 'heatmap') {
             this.notify("Remove POI Failed", "Cannot remove an unexisting POI", false);
           } else {
+            this.$store.commit("deletePoi", val.info.object.id);
+            this.update_layers('scatter');
             this.notify("Remove POI Succeed", "It may take a while to recalculate", true);
           }
         } else 
@@ -310,6 +317,7 @@ export default {
             radiusMaxPixels: 4,
             getRadius: d => 4,
             getPosition: d => {
+              //console.log(this.pois);
               return [d.long, d.lat];
             },
             getFillColor: d => [0, 0, 255],
@@ -340,8 +348,10 @@ export default {
       update_layers(layer='all') {
         if(layer === 'all' || layer === 'hex')
         this.hexagonLayer = this.createHexagonLayer();
-        if(layer === 'all' || layer === 'scatter')
-        this.scatterLayer = this.createScatterLayer();
+        if(layer === 'all' || layer === 'scatter'){
+          //console.log('hello');
+          this.scatterLayer = this.createScatterLayer();
+        }
         this.layers = [this.hexagonLayer, this.scatterLayer];
       },
     },
