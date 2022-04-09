@@ -23,7 +23,7 @@
         <el-radio-group style="margin-left:20px;" v-model="radio">
             <el-radio-button :label="0">Default</el-radio-button>
             <el-radio-button :label="1">Add</el-radio-button>
-            <el-radio-button :label="2">Delete</el-radio-button>
+            <!-- <el-radio-button :label="2">Delete</el-radio-button> -->
         </el-radio-group>
 
         
