@@ -235,7 +235,6 @@ export default {
         if(this.clickEvent === 1) {
           if(val.info.layer.id === 'heatmap') {
             var newpois = this.pois;
-            console.log(newpois);
             newpois.push({'long': val.info.coordinate[0], 'lat': val.info.coordinate[1], 'name':'','h3id':'','id':'','category':'','coords':{'lat':'','long':''}});
             this.$store.commit("addPoi", newpois);
             this.update_layers('scatter');
