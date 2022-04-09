@@ -190,6 +190,7 @@ export default {
         checkedDemographicTypes: {
           handler(val) {
             this.$store.commit('setConfigDemographicType', val[0]);
+            this.update_layers('hex');
             if(val[0] === this.$store.state.config.demographic_category) return;
             this.commit_config_change("demographic_category");
           },
