@@ -9,7 +9,10 @@ class UpdatePack {
               "time_of_day": "morning",
               "city_id": 1
             },
-            "poi_list": []
+            "poi_list": {
+                "added": [],
+                "deleted": []
+            }
           }
     }
 

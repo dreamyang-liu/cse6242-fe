@@ -1,7 +1,9 @@
 <template>
 <div>
     <div class="nav_bar">
-        <!-- <h1> This is the Navigation Bar </h1> -->
+        <div><img src="https://thumbs.gfycat.com/AgedHeavyHumpbackwhale.webp" alt="" class="nav_img"> </div>
+        <span class="nav_title"> The Ease and Equity of Point of Interest Accessibility
+via Public Transit in the US </span>
     </div>
     <div class="main_container">
         <div class="select_map_container">
@@ -125,7 +127,21 @@ export default {
 .nav_bar {
     width: 100vw;
     height: 5vh;
-    background: saddlebrown;
+    color: whitesmoke;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, #09e9ad, #168aef);
+    display: flex;
+    flex-direction: row;
+    .nav_img {
+        width: 4vw;
+        height: 5vh;
+    }
+    .nav_title {
+        font-size: 3vh;
+        font-weight: bold;
+        text-shadow: 0 0 0.5vh black;
+    }
 }
 .main_container {
     display: flex;

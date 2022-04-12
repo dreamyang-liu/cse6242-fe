@@ -55,11 +55,11 @@ class FEProxy extends FEProxyBase {
         });
     }
 
-    // updateConfig(callback) {
-    //     this.get(`/city_data`, (response) => {
-    //         callback(JSON.parse(response));
-    //     });
-    // }
+    updatePOIs(callback, payload) {
+        this.get(`/city_data`, (response) => {
+            callback(JSON.parse(response));
+        });
+    }
 
     fetchCatchement(callback, id, time, demographic) {
         this.get(`/catchment/${1}/${id}?time_of_day=${time}&demographics_category=${demographic}`, (response) => {

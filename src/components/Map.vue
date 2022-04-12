@@ -113,6 +113,7 @@ export default {
             hex_set: new Set(),
             time_of_day: 'morning',
             addedPois: [],
+            deletedPois: [],
             options: [
             {
               value: 'race',
@@ -259,7 +260,7 @@ export default {
               this.picked_poi_id = val.info.object.id;
               this.update_layers('scatter');
               let proxy = new FEProxy();
-              proxy.fetchCatchement(this.handleCatchment, val.info.object.id, this.time_of_day, this.checkedDemographicTypes);
+              proxy.fetchCatchement(this.handleCatchment, val.info.object.h3id, this.time_of_day, this.checkedDemographicTypes[0]);
             }
           } else this.handleAddPOI(val);
         } catch (e) {
@@ -271,9 +272,18 @@ export default {
         if(this.clickEvent === 1) {
           console.log(val);
           if(val.info.layer.id === 'heatmap') {
-            let new_poi = {'long': val.info.coordinate[0], 'lat': val.info.coordinate[1], 'name':'wqdwadw','h3id':'d12rdwad','id':-1,'category':'asd','coords':{'lat':val.info.coordinate[1],'long':val.info.coordinate[0]}};
-            // this.$store.commit("addPoi", new_poi);
+            let new_poi = {'long': val.info.coordinate[0], 'lat': val.info.coordinate[1], 'name':`Unknown ${this.checkedPOITypes}`,'h3id':h3.geoToH3(val.info.coordinate[1], val.info.coordinate[0], 9),'id':-1 + -1 * this.addedPois.length,'category':this.checkedPOITypes,'coords':{'lat':val.info.coordinate[1],'long':val.info.coordinate[0]}};
             this.addedPois.push(new_poi);
+            let update_pack = new UpdatePack();
+            update_pack.add_change("poi_add");
+            update_pack.fill_poi_list({
+              "added": this.addedPois.map(val => val.h3id),
+              "deleted": this.deletedPois
+            });
+            let proxy = new FEProxy();
+            proxy.updateConfig((data)=> {
+              this.$store.commit("setStatistics", data.stats);
+            }, update_pack);
             this.notify("Add POI Succeed", "It may take a while to recalculate", true);
           } else {
             this.notify("Add POI Failed", "Cannot add POI on a existing POI", false);
@@ -287,7 +297,19 @@ export default {
           if(val.info.layer.id === 'heatmap') {
             this.notify("Remove POI Failed", "Cannot remove an unexisting POI", false);
           } else {
-            this.$store.commit("deletePoi", val.info.object.id);
+            // this.$store.commit("deletePoi", val.info.object.id);
+            this.deletedPois.push(val.info.object.h3id);
+            let update_pack = new UpdatePack();
+            update_pack.add_change("poi_remove");
+            update_pack.fill_poi_list({
+              "added": this.addedPois.map(val => val.h3id),
+              "deleted": this.deletedPois
+            });
+            let proxy = new FEProxy();
+            proxy.updateConfig((data)=> {
+              this.$store.commit("setStatistics", data.stats);
+              this.$store.commit("setPois", data.pois.data);
+            }, update_pack);
             this.notify("Remove POI Succeed", "It may take a while to recalculate", true);
           }
         } else 

@@ -67,41 +67,14 @@ export default {
     plugins: {
       type: Object,
       default: () => {}
+    },
+    chartData: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
     return {
-      chartData: {
-        labels: [
-          'Asian',
-          'Black',
-          'White',
-          'Hispanic',
-          'Other',
-        ],
-        datasets: [
-          {
-            label: 'Original Ratio',
-            backgroundColor: 'rgba(179,181,198,0.2)',
-            borderColor: 'rgba(179,181,198,1)',
-            pointBackgroundColor: 'rgba(179,181,198,1)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgba(179,181,198,1)',
-            data: [65, 59, 68, 44, 56]
-          },
-          {
-            label: 'Coverage',
-            backgroundColor: 'rgba(255,99,132,0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            pointBackgroundColor: 'rgba(255,99,132,1)',
-            pointBorderColor: '#fff',
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgba(255,99,132,1)',
-            data: [50, 55, 66, 44, 55]
-          }
-        ]
-      },
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false

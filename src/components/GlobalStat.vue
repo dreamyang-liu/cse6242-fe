@@ -8,13 +8,14 @@
         <BarChart
         v-if="item == 'Bar'"
         :width="400"
-        :height="300"
+        :height="400"
         :chartData="barChartData"
         />
         <Radar
         v-if="item == 'Radar'"
         :width="400"
         :height="300"
+        :chartData="radarChartData"
         />
         <LineChart
         v-if="item == 'Line'"
@@ -66,7 +67,6 @@ import DoughnutChart from './charts/Doughnut.vue';
 import PolarArea from './charts/PolarArea.vue';
 
 import { mapState } from 'vuex';
-
 export default {
     name: "GlobalStat",
     components: {
@@ -79,8 +79,9 @@ export default {
     },
     data() {
         return {
-            items: ["Bar", "Radar", "Line", "Bubble", "Doughnut", "PolarArea"],
-            barChartData: {}
+            items: ["Radar", "Line", "Bubble", "Doughnut", "PolarArea"],
+            barChartData: {},
+            radarChartData: {},
         }
     },
     computed: {
@@ -100,10 +101,24 @@ export default {
     methods: {
         render(data) {
           console.log(data);
-          this.barChartData = {
-            labels: [...Object.keys(data.index_detail)],
-            datasets: [ { data: [...Object.values(data.index_detail)] } ]
+          let keys = Object.keys(data.index_detail);
+          let values = Object.values(data.index_detail);
+          let radarChartData = {
+            labels: [...keys],
+            datasets: [
+              {
+                label: 'City Level Score',
+                backgroundColor: '#f67019',
+                borderColor: '#f67019',
+                pointBackgroundColor: '#f67019',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#f0f',
+                pointHoverBorderColor: '#f67019',
+                data: values
+              }
+            ]
           }
+          this.radarChartData = radarChartData;
         }
     }
 }
