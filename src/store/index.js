@@ -8,7 +8,7 @@ export default new Vuex.Store({
     config: {
       city_id: 1,
       poi_category: "Vaccination centre",
-      demographic_category: "race",
+      demographic_category: "Race",
       time_of_day: "morning",
     },
     pois: null,

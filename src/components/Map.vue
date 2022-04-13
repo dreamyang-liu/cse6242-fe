@@ -89,7 +89,7 @@ export default {
               marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
             },
             checkedPOITypes: "Vaccination centre",
-            checkedDemographicTypes: ['race', 'all'],
+            checkedDemographicTypes: ['Race', 'all'],
             checkTimeTypes: [],
             data: null,
 
@@ -116,7 +116,7 @@ export default {
             deletedPois: [],
             options: [
             {
-              value: 'race',
+              value: 'Race',
               label: 'Race',
               children: [
                 {
@@ -141,19 +141,19 @@ export default {
                 }]
             },
             {
-              value: 'age and sex',
+              value: 'Age and Sex',
               label: 'Age and Sex'
             },
             {
-              value: 'income',
+              value: 'Income',
               label: 'Income'
             },
             {
-              value: 'origin',
+              value: 'Origin',
               label: 'Origin'
             },
             {
-              value: 'vehicle availability',
+              value: 'Vehicle Availability',
               label: 'Vehicle Availability'
             }
             ],
@@ -400,7 +400,7 @@ export default {
           getRadius: d => 4,
           getFillColor: d => {
               if(this.picked_poi_id === d.id) return [0,255,255];
-              return [140,0,0];
+              return [170,10,217];
           },
           updateTriggers: {
             getFillColor: this.picked_poi_id,
