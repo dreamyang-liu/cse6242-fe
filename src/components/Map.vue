@@ -228,6 +228,7 @@ export default {
         if(this.polygonLayer === null) return;
         this.picked_poi_id = null;
         this.polygonLayer = null;
+        this.$store.commit('clearPOIStatistics');
         this.update_layers('scatter');
         this.notify("Remove Catchments Succeed", "All catchment areas removed", true);
       },
@@ -249,6 +250,16 @@ export default {
       handleCatchment(val) {
         let coverage = JSON.parse(val);
         let coordinates = coverage.geometry.coordinates;
+        let poi_stat = {
+        labels: Object.keys(coverage.population_detail),
+          datasets: [
+            {
+              backgroundColor: ['#43A047', '#0D6986', '#8956FF', '#f93e6e', '#EF5411', '#5C4B51', '#cc773f'],
+              data: Object.values(coverage.population_detail)
+            }
+          ]
+        }
+        this.$store.commit('setPOIStatistics', poi_stat);
         this.update_layers('polygon', coordinates);
       },
       handleClickChain(val) {

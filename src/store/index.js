@@ -16,6 +16,15 @@ export default new Vuex.Store({
     cityList: {},
     clickEvent: 0,
     statistics: {},
+    poi_statistics:{
+      labels: ['None'],
+      datasets: [
+        {
+          backgroundColor: ['#A0A0A0'],
+          data: [1]
+        }
+      ]
+    },
   },
   mutations: {
     setClickEvent(state, clickEvent) {
@@ -41,6 +50,20 @@ export default new Vuex.Store({
     },
     setStatistics(state, statistics) {
       state.statistics = statistics;
+    },
+    setPOIStatistics(state, poi_statistics) {
+      state.poi_statistics = poi_statistics;
+    },
+    clearPOIStatistics(state) {
+      state.poi_statistics = {
+        labels: ['None'],
+        datasets: [
+          {
+            backgroundColor: ['#A0A0A0'],
+            data: [1]
+          }
+        ]
+      };
     },
     setConfigPOIType(state, poiType) {
       state.config.poiType = poiType;

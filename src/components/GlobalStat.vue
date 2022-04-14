@@ -47,9 +47,10 @@
   <div class="block">
     <el-carousel trigger="click" height="35vh" :autoplay=false>
       <el-carousel-item v-for="item in items" :key="item">
-        <BarChart 
+        <DoughnutChart 
         :width="400"
         :height="270"
+        :chartData="dongnutChartData"
         />
       </el-carousel-item>
     </el-carousel>
@@ -79,14 +80,14 @@ export default {
     },
     data() {
         return {
-            items: ["Radar", "Line", "Bubble", "Doughnut", "PolarArea"],
-            barChartData: {},
+            items: ["Radar"],
             radarChartData: {},
         }
     },
     computed: {
       ...mapState({
-        statistics: state => state.statistics
+        statistics: state => state.statistics,
+        dongnutChartData: state => state.poi_statistics,
       })
     },
     watch: {
