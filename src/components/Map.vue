@@ -365,12 +365,12 @@ export default {
             let factor = [600, 100, 100, 50, 50, 10];
             if(this.hex_set.has(d.h3id)) return [0,255,0];
 
-            if(this.checkedDemographicTypes.indexOf('white') != -1){return [255,(d.data['White']/factor[1]) * 255,0];}
-            if(this.checkedDemographicTypes.indexOf('black') != -1){return [255,(d.data['Black or African American']/factor[2]) * 255,0];}
-            if(this.checkedDemographicTypes.indexOf('asian') != -1){return [255,(d.data['Asian']/factor[3]) * 255,0];}
-            if(this.checkedDemographicTypes.indexOf('native') != -1){return [255,(d.data['American Indian and Alaska Native']/factor[4]) * 255,0];}
-            if(this.checkedDemographicTypes.indexOf('hawaiian') != -1){return [255,(d.data['Native Hawaiian and Other Pacific Islander']/factor[5]) * 255,0];}
-            return [255,(d.total/factor[0]) * 255,0];
+            if(this.checkedDemographicTypes.indexOf('white') != -1){return [255,255-(d.data['White']/factor[1]) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('black') != -1){return [255,255-(d.data['Black or African American']/factor[2]) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('asian') != -1){return [255,255-(d.data['Asian']/factor[3]) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('native') != -1){return [255,255-(d.data['American Indian and Alaska Native']/factor[4]) * 255,0];}
+            if(this.checkedDemographicTypes.indexOf('hawaiian') != -1){return [255,255-(d.data['Native Hawaiian and Other Pacific Islander']/factor[5]) * 255,0];}
+            return [255,255-(d.total/factor[0]) * 255,0];
             
           },
           // updateTriggers: {
