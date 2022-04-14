@@ -5,37 +5,11 @@
   <div class="block">
     <el-carousel trigger="click" height="35vh" :autoplay=false>
       <el-carousel-item v-for="item in items" :key="item">
-        <BarChart
-        v-if="item == 'Bar'"
-        :width="400"
-        :height="400"
-        :chartData="barChartData"
-        />
         <Radar
         v-if="item == 'Radar'"
         :width="400"
         :height="300"
         :chartData="radarChartData"
-        />
-        <LineChart
-        v-if="item == 'Line'"
-        :width="400"
-        :height="300"
-        />
-        <Bubble
-        v-if="item == 'Bubble'"
-        :width="400"
-        :height="300"
-        />
-        <DoughnutChart
-        v-if="item == 'Doughnut'"
-        :width="400"
-        :height="300"
-        />
-        <PolarArea
-        v-if="item == 'PolarArea'"
-        :width="400"
-        :height="300"
         />
       </el-carousel-item>
     </el-carousel>
@@ -49,7 +23,7 @@
       <el-carousel-item v-for="item in items" :key="item">
         <DoughnutChart 
         :width="400"
-        :height="270"
+        :height="400"
         :chartData="dongnutChartData"
         />
       </el-carousel-item>
@@ -60,23 +34,15 @@
 </template>
 
 <script>
-import BarChart from './charts/BarChart.vue';
 import Radar from './charts/Radar.vue';
-import LineChart from './charts/LineChart.vue';
-import Bubble from './charts/Bubble.vue';
 import DoughnutChart from './charts/Doughnut.vue';
-import PolarArea from './charts/PolarArea.vue';
 
 import { mapState } from 'vuex';
 export default {
     name: "GlobalStat",
     components: {
-        BarChart,
         Radar,
-        LineChart,
-        Bubble,
         DoughnutChart,
-        PolarArea
     },
     data() {
         return {
@@ -108,7 +74,7 @@ export default {
             labels: [...keys],
             datasets: [
               {
-                label: 'City Level Score',
+                label: 'City Level Accessibilty Score',
                 backgroundColor: '#f67019',
                 borderColor: '#f67019',
                 pointBackgroundColor: '#f67019',
