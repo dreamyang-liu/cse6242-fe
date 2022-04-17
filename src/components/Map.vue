@@ -191,7 +191,7 @@ export default {
             viewState.longitude = long;
             viewState.latitude = lat;
             this.viewState = viewState;
-            this.map.flyTo({
+            this.map.easeTo({
               center: [viewState.longitude, viewState.latitude],
               zoom: viewState.zoom,
               bearing: viewState.bearing,
