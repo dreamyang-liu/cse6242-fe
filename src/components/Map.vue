@@ -358,7 +358,7 @@ export default {
         let layer = new PolygonLayer({
             id: 'polygon-layer',
             data,
-            pickable: true,
+            pickable: false,
             stroked: true,
             filled: true,
             wireframe: true,
