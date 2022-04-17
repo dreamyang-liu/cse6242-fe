@@ -168,10 +168,12 @@ export default {
     },
     watch: {
         opacity(newVal, oldVal) {
+            this.clearCatchment();
             this.update_layers('hex');
         },
         pois: {
           handler(val) {
+            this.clearCatchment();
             this.update_layers('scatter');
           },
           deep: true
@@ -179,11 +181,13 @@ export default {
         addedPois: {
           handler(val) {
             console.log(val);
+            this.clearCatchment();
             this.update_layers('scatter');
           }
         },
         cityData: {
           handler(val) {
+            this.clearCatchment();
             this.update_layers('hex');
             let long = val.pois.data[0].long;
             let lat = val.pois.data[0].lat;
@@ -202,6 +206,7 @@ export default {
         },
         checkedDemographicTypes: {
           handler(val) {
+            this.clearCatchment();
             this.$store.commit('setConfigDemographicType', val[0]);
             this.update_layers('hex');
             if(val[0] === this.$store.state.config.demographic_category) return;
@@ -211,6 +216,7 @@ export default {
         },
         time_of_day: {
           handler(val) {
+            this.clearCatchment();
             this.$store.commit('setConfigTimeofDay', val);
             this.commit_config_change("time_of_day");
           },
@@ -218,6 +224,7 @@ export default {
         },
         checkedPOITypes: {
           handler(val) {
+            this.clearCatchment();
             this.$store.commit('setConfigPOIType', val);
             this.commit_config_change("poi_category");
           },
