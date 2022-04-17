@@ -64,8 +64,20 @@ export default {
         }
     },
     methods: {
+        render(data) {
+            this.$store.commit("setCityData", data);
+            this.$store.commit("setPois", data.pois.data);
+            this.$store.commit("setStatistics", data.stats);
+            let newConfig = {
+              city_id: this.value,
+              poi_category: "Vaccination centre",
+              demographic_category: "Race",
+              time_of_day: "morning",
+            };
+            this.$store.commit("setConfig", newConfig);
+        },
         update_callback(cityData) {
-          this.$store.commit("setCityData", cityData);
+          this.render(cityData);
         },
         handleClose(done) {
         this.$confirm('Are you sure you want to close this box?')
@@ -81,14 +93,11 @@ export default {
     }),
     watch: {
         value(val) {
-            this.$store.commit("setConfigCity", val);
+            console.log(val);
+            // this.$store.commit("reset");
+            // this.$store.commit("setConfigCity", val);
             let proxy = new FEProxy();
-            proxy.configUpdate(this.config, this.update_callback);
-        },
-        poi_type(val) {
-            this.$store.commit("setConfigPOIType", val);
-            let proxy = new FEProxy();
-            proxy.configUpdate(this.config, this.update_callback);
+            proxy.switchCity(val, this.update_callback);
         },
         radio(val) {
             this.$store.commit("setClickEvent", val);

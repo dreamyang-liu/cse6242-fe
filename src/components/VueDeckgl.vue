@@ -196,16 +196,19 @@ export default {
     /**
      * Update the viewstate of deckgl whenever the prop changes
      */
-    viewState(newViewState) {
-      this.deck.setProps({
-        viewState: {
-          ...newViewState,
-          // add flyto transitions whenever the viewstates change
-          // additionally this to work, the user needs to specify the transitionDuration
-          // within the newViewState
-          transitionInterpolator: new FlyToInterpolator(),
-        },
-      });
+    viewState: {
+      handler(newViewState) {
+        this.deck.setProps({
+          viewState: {
+            ...newViewState,
+            // add flyto transitions whenever the viewstates change
+            // additionally this to work, the user needs to specify the transitionDuration
+            // within the newViewState
+            transitionInterpolator: new FlyToInterpolator(),
+          },
+        });
+      },
+      deep: true,
     },
     /**
      * Updates the effexts of deck.gl whenever the prop changes

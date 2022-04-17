@@ -49,6 +49,17 @@ class FEProxy extends FEProxyBase {
         });
     }
 
+    switchCity(new_city_id, callback) {
+        let update_pack = new UpdatePack();  
+        update_pack.add_change("poi_category");
+        update_pack.add_change("demographic_category");
+        update_pack.add_change("time_of_day");
+        update_pack.obj.config.city_id = new_city_id;
+        this.post(`/city_data/`, update_pack.obj, (response) => {
+            callback(JSON.parse(response));
+        });
+    }
+
     updateConfig(callback, payload) {
         this.post(`/city_data/`, payload.obj, (response) => {
             callback(JSON.parse(response));
@@ -61,8 +72,8 @@ class FEProxy extends FEProxyBase {
         });
     }
 
-    fetchCatchement(callback, id, time, demographic) {
-        this.get(`/catchment/${1}/${id}?time_of_day=${time}&demographics_category=${demographic}`, (response) => {
+    fetchCatchement(callback, city_id, id, time, demographic) {
+        this.get(`/catchment/${city_id}/${id}?time_of_day=${time}&demographics_category=${demographic}`, (response) => {
             callback(response);
         });
     }

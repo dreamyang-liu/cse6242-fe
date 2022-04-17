@@ -185,6 +185,18 @@ export default {
         cityData: {
           handler(val) {
             this.update_layers('hex');
+            let long = val.pois.data[0].long;
+            let lat = val.pois.data[0].lat;
+            let viewState = this.viewState;
+            viewState.longitude = long;
+            viewState.latitude = lat;
+            this.viewState = viewState;
+            this.map.flyTo({
+              center: [viewState.longitude, viewState.latitude],
+              zoom: viewState.zoom,
+              bearing: viewState.bearing,
+              pitch: viewState.pitch
+            });
           },
           deep: true
         },
@@ -271,7 +283,7 @@ export default {
               this.picked_poi_id = val.info.object.id;
               this.update_layers('scatter');
               let proxy = new FEProxy();
-              proxy.fetchCatchement(this.handleCatchment, val.info.object.h3id, this.time_of_day, this.checkedDemographicTypes[0]);
+              proxy.fetchCatchement(this.handleCatchment, this.$store.state.config.city_id, val.info.object.h3id, this.time_of_day, this.checkedDemographicTypes[0]);
             }
           } else this.handleAddPOI(val);
         } catch (e) {
