@@ -1,6 +1,21 @@
 <template>
   <div class="city_select">
-      <el-button style="margin-right:150px;" type="primary" plain @click="dialogVisible = true">Methodology Details</el-button>
+    <span style="margin-right:10px;">City Analyzed:</span>
+      <div style="padding: 1px 0;">
+          <el-select v-model="value" placeholder="Select City">
+        <el-option v-for="item in cityList" :key="item.value" :label="item.label" :value="item.value">
+            {{ item.label }}
+        </el-option>
+      </el-select>
+
+        <span style="margin-right:10px; margin-left:20px;">Interaction:</span>
+        <el-radio-group style="margin-left:10px;" v-model="radio">
+            <el-radio-button :label="0">Explore</el-radio-button>
+            <el-radio-button :label="1">Add New POIs</el-radio-button>
+            <el-radio-button :label="2">Remove POIs</el-radio-button>
+        </el-radio-group>
+      </div>
+      <el-button style="margin-left:20px;" type="primary" plain @click="dialogVisible = true">Methodology Details</el-button>
 
         <el-dialog
         title="Methodology"
@@ -12,41 +27,7 @@
         </span>
         </el-dialog>
         
-
-      <div style="padding: 1px 0;">
-          <el-select v-model="value" placeholder="Select City">
-        <el-option v-for="item in cityList" :key="item.value" :label="item.label" :value="item.value">
-            {{ item.label }}
-        </el-option>
-      </el-select>
-
-        <el-radio-group style="margin-left:20px;" v-model="radio">
-            <el-radio-button :label="0">Default</el-radio-button>
-            <el-radio-button :label="1">Add</el-radio-button>
-            <el-radio-button :label="2">Delete</el-radio-button>
-        </el-radio-group>
-
-        
-
-<!-- <script>
-  export default {
-    data() {
-      return {
-        dialogVisible: false
-      };
-    },
-    methods: {
-      handleClose(done) {
-        this.$confirm('Are you sure to close this dialog?')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
-      }
-    }
-  };
-</script> -->
-      </div>
+      
 
   </div>
 </template>
