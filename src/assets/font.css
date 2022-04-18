@@ -4,3 +4,9 @@
     font-weight: normal;
     font-style: normal;
 }
+
+label.el-radio {
+    clear: both;
+    float: left;
+    padding-bottom: 0.5em;
+}
