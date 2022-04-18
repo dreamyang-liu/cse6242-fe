@@ -307,6 +307,7 @@ export default {
             this.addedPois.push(new_poi);
             let update_pack = new UpdatePack();
             update_pack.add_change("poi_add");
+            update_pack.fill_config(this.$store.state.config);
             update_pack.fill_poi_list({
               "added": this.addedPois.map(val => val.h3id),
               "deleted": this.deletedPois
@@ -332,10 +333,11 @@ export default {
             this.deletedPois.push(val.info.object.h3id);
             let update_pack = new UpdatePack();
             update_pack.add_change("poi_remove");
+            update_pack.fill_config(this.$store.state.config);
             update_pack.fill_poi_list({
               "added": this.addedPois.map(val => val.h3id),
               "deleted": this.deletedPois
-            });
+            });            
             let proxy = new FEProxy();
             proxy.updateConfig((data)=> {
               this.$store.commit("setStatistics", data.stats);
