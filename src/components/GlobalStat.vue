@@ -14,7 +14,7 @@
         <BarChart
         v-if="item == 'Bar'"
         :width="400"
-        :height="400"
+        :height="330"
         :chartData="radarChartData"
         />
       </el-carousel-item>
