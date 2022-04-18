@@ -208,8 +208,8 @@ export default {
         checkedDemographicTypes: {
           handler(val) {
             this.clearCatchment();
-            this.$store.commit('setConfigDemographicType', val[0]);
             if(val[0] === this.$store.state.config.demographic_category) return;
+            this.$store.commit('setConfigDemographicType', val[0]);
             this.commit_config_change("demographic_category");
             this.update_layers('hex');
           },
@@ -240,7 +240,8 @@ export default {
         let proxy = new FEProxy();
         proxy.updateConfig((data)=> {
           this.$store.commit("setStatistics", data.stats);
-          this.$store.commit("setPois", data.pois.data);
+          if(data.pois !== null)
+            this.$store.commit("setPois", data.pois.data);
         }
         , update_pack);
       },
