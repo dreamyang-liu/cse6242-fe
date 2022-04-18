@@ -14,38 +14,39 @@
     </VueDeckgl>
     <div id="map" ref="map"></div>
     <el-popover
-      placement="right"
-      width="400"
+      placement="bottom"
+      width="300"
       trigger="click"
       class="control-panel">
-        <div class="block">
-          <span class="demonstration">Opacity</span>
-          <el-slider style="width:200px;" v-model="opacity" :width="300" :min="0" :max="1" :step="0.01"></el-slider>
-        </div>
-        <el-divider></el-divider>
-        <p class="demonstration">POI Type</p>
+        
+
+        <h3>Accessibility statistics parameters</h3>
+        <p class="demonstration cp-title">Point of interest type</p>        
+
         <el-radio-group v-model="checkedPOITypes">
           <el-radio v-for="item in poi_types" :label="item" :key="item">{{item}}</el-radio>
         </el-radio-group>
-        <br>
-        <el-button type="primary" icon="el-icon-delete" @click="clearCatchment">Clear Catchments</el-button>
+
+        <p class="demonstration">Time of Day</p>
+        <el-radio-group v-model="time_of_day">
+          <el-radio-button v-for="item in time_types" :label="item" :key="item">{{item}}</el-radio-button>
+        </el-radio-group>        
         <el-divider></el-divider>
 
         <!-- <el-checkbox-group v-model="checkedDemographicTypes" @change="handleCheckedDemographicChange">
           <el-checkbox v-for="item in demographic_types" :label="item" :key="item">{{item}}</el-checkbox>
         </el-checkbox-group> -->
-        <p class="demonstration">Demographic Groups</p>
-        <el-cascader v-model="checkedDemographicTypes" :options="options"></el-cascader>
+        
+        <p class="demonstration cp-title">Demographic Groups</p>
+        <el-cascader v-model="checkedDemographicTypes" :options="options"></el-cascader>        
+        
         <el-divider></el-divider>
-        <p class="demonstration">Time of Day</p>
-        <el-radio-group v-model="time_of_day">
-          <el-radio-button v-for="item in time_types" :label="item" :key="item">{{item}}</el-radio-button>
-        </el-radio-group>
-          <!-- <div>
-            <label for="color">Color Inversion</label>
-            <input id="color" type="checkbox" name="color" @change="update_layers">
-            <span id="color-value"></span>    
-          </div>   -->
+        <div class="block">
+          <span class="demonstration">Map opacity</span>
+          <el-slider style="width:200px;" v-model="opacity" :width="300" :min="0" :max="1" :step="0.01"></el-slider>
+        </div>        
+        <el-button type="primary" icon="el-icon-delete" @click="clearCatchment">Clear visible catchments</el-button>
+        
       <el-button slot="reference">Control Panel</el-button>
     </el-popover>
 </div>
