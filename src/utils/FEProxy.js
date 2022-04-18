@@ -4,9 +4,14 @@ class FEProxyBase {
     constructor() {
         this.ajax = new XMLHttpRequest();
     }
+
+    api_endpoint() {
+        return '/api'
+    }
     
     get(url, callback) {
-        this.ajax.open("GET", url, false);
+        console.log(this.api_endpoint() + url)
+        this.ajax.open("GET", this.api_endpoint() + url, false);
         this.ajax.onreadystatechange = () => {
             if (this.ajax.readyState === 4 && this.ajax.status === 200) {
                 callback(this.ajax.responseText);
@@ -16,7 +21,7 @@ class FEProxyBase {
     }
 
     post(url, data, callback) {
-        this.ajax.open("POST", url);
+        this.ajax.open("POST", this.api_endpoint() + url);
         this.ajax.setRequestHeader("Content-Type", "application/json");
         this.ajax.onreadystatechange = () => {
             if (this.ajax.readyState === 4 && this.ajax.status === 200) {
@@ -34,7 +39,7 @@ class FEProxy extends FEProxyBase {
     }
 
     fetchConfig(callback) {
-        this.get("/config", (response) => {
+        this.get("/configuration", (response) => {
             callback(JSON.parse(response));
         });
     }
@@ -67,7 +72,7 @@ class FEProxy extends FEProxyBase {
     }
 
     updatePOIs(callback, payload) {
-        this.get(`/city_data`, (response) => {
+        this.get(`/city_data/`, (response) => {
             callback(JSON.parse(response));
         });
     }

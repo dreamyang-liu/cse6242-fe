@@ -19,9 +19,34 @@ npm run build
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
-## TODO
-- [ ] Statistics Board
-- [ ] Interface to fetch data from backend
-- [x] Map and hexgon layer
-- [ ] Control panel with all options
-- [ ] Compare page view
+## Serving the backend
+`uvicorn serve:app --reload --port 8002 --root-path /api`
+
+(root-path option required to have docs working properly)
+
+
+## Nginx configuration 
+
+For a guide on how to setup Nginx reverse proxy, see https://phoenixnap.com/kb/nginx-reverse-proxy.
+
+You will need the following setup in the nginx.conf (or equivalent) file:
+
+```
+server {
+
+        listen 80;
+
+        location / {
+
+        proxy_pass http://localhost:8080;
+
+        }
+
+        location /api/ {
+
+        proxy_pass http://localhost:8002/;
+
+        }
+
+}
+```
