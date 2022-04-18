@@ -274,7 +274,7 @@ export default {
         labels: Object.keys(coverage.population_detail),
           datasets: [
             {
-              backgroundColor: ['#43A047', '#0D6986', '#8956FF', '#f93e6e', '#EF5411', '#5C4B51', '#cc773f'],
+              backgroundColor: ['#43A047', '#0D6986', '#8956FF', '#f93e6e', '#EF5411', '#5C4B51', '#cc773f', '#D64045', '#467599', '#546A7B'],
               data: Object.values(coverage.population_detail)
             }
           ]
