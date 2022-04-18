@@ -206,11 +206,10 @@ export default {
           deep: true
         },
         checkedDemographicTypes: {
-          handler(val) {            
+          handler(val) {
             this.clearCatchment();
-            this.$store.commit('setConfigDemographicType', val[0]);            
-            //this will always be true as it is just set above - not sure why we had it here?
-            //if(val[0] === this.$store.state.config.demographic_category) return;                         
+            this.$store.commit('setConfigDemographicType', val[0]);
+            if(val[0] === this.$store.state.config.demographic_category) return;
             this.commit_config_change("demographic_category");
             this.update_layers('hex');
           },
@@ -379,7 +378,7 @@ export default {
             // getElevation: d => d.population / d.area / 10,
             getFillColor: d => [ 60, 140, 0],
             getLineColor: [80, 80, 80],
-            getLineWidth: 1
+            getLineWidth: 1,
           });
         return layer;
       },

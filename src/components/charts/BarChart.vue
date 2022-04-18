@@ -64,6 +64,7 @@ export default {
   data() {
     return {
       chartOptions: {
+        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false
       }

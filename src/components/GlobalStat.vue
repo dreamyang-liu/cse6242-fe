@@ -5,10 +5,16 @@
   <div class="block">
     <el-carousel trigger="click" height="35vh" :autoplay=false>
       <el-carousel-item v-for="item in items" :key="item">
-        <Radar
+        <!-- <Radar
         v-if="item == 'Radar'"
         :width="400"
         :height="300"
+        :chartData="radarChartData"
+        /> -->
+        <BarChart
+        v-if="item == 'Bar'"
+        :width="400"
+        :height="400"
         :chartData="radarChartData"
         />
       </el-carousel-item>
@@ -34,19 +40,20 @@
 </template>
 
 <script>
-import Radar from './charts/Radar.vue';
+// import Radar from './charts/Radar.vue';
+import BarChart from './charts/BarChart.vue';
 import DoughnutChart from './charts/Doughnut.vue';
 
 import { mapState } from 'vuex';
 export default {
     name: "GlobalStat",
     components: {
-        Radar,
+        BarChart,
         DoughnutChart,
     },
     data() {
         return {
-            items: ["Radar"],
+            items: ["Bar"],
             radarChartData: {},
         }
     },
