@@ -189,9 +189,9 @@ export default {
         cityData: {
           handler(val) {
             this.clearCatchment();
-            this.update_layers('hex');
-            let long = val.pois.data[0].long;
-            let lat = val.pois.data[0].lat;
+            this.update_layers('hex');            
+            let long = val.long;
+            let lat = val.lat;
             let viewState = this.viewState;
             viewState.longitude = long;
             viewState.latitude = lat;
