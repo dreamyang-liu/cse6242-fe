@@ -58,50 +58,7 @@ export default {
                 });
             }
             this.$store.commit("setCityList", parsed_cities);
-        },
-        dummy_render(data) {
-            let _this = this;
-            const load_data = new Promise((resolve, reject) => {
-                d3.csv('./dummy_data.csv')
-                    .then(response => {
-                    let pois = response.map(d => [Number(d.stop_lon), Number(d.stop_lat)]);
-                    this.$store.commit("setPois", pois);
-                });
-                d3.csv('lat_lon_to_census_data.csv')
-                    .then(response => {
-                    let data = response.map(d => ({hex: h3.geoToH3(Number(d.lat), Number(d.lon), 9), lon: Number(d.lon), lat: Number(d.lat), totpop: Number(d.pop_total), white: Number(d.pop_white), black: Number(d.pop_black), hisp: Number(d.pop_indian_alaskan), asian: Number(d.pop_asian)}));
-                    // Calculate the sums and group data (while tracking count)
-                    data = data.reduce(function(m, d){
-                        if(!m[d.hex]){
-                            m[d.hex] = {...d, count: 1};
-                            return m;
-                        }
-                        m[d.hex].totpop += d.totpop;
-                        m[d.hex].white += d.white;
-                        m[d.hex].black += d.black;
-                        m[d.hex].hisp += d.hisp;
-                        m[d.hex].asian += d.asian;
-                        m[d.hex].count += 1;
-                        return m;
-                    },{});
-                    
-                    // Create new array from grouped data and compute the average
-                    let city_data = Object.keys(data).map(function(k){
-                        let item  = data[k];
-                        return {
-                            hex: item.hex,
-                            totpop: item.totpop,
-                            count: item.count,
-                            white: item.white,
-                            black: item.black,
-                            hisp: item.hisp,
-                            asian: item.asian
-                        }
-                    });
-                    this.$store.commit("setCityData", city_data);
-                });
-            });
-        },
+        },        
         render(data) {
             this.$store.commit("setCityData", data);
             this.$store.commit("setPois", data.pois.data);
