@@ -14,6 +14,7 @@ export default new Vuex.Store({
     pois: null,
     cityData: {},
     cityList: {},
+    demographics:{},
     clickEvent: 0,
     statistics: {},
     poi_statistics:{
@@ -44,6 +45,9 @@ export default new Vuex.Store({
     },
     setCityData(state, cityData) {
       state.cityData = cityData;
+    },
+    setDemographics(state, demographics) {
+      state.cityData.demographics = demographics;
     },
     setCityList(state, cityList) {
       state.cityList = cityList;

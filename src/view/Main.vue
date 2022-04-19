@@ -61,16 +61,13 @@ export default {
         },        
         render(data) {
             this.$store.commit("setCityData", data);
+            // this.$store.commit("setDemographics", data.demographics.data);
             this.$store.commit("setPois", data.pois.data);
             this.$store.commit("setStatistics", data.stats);
         },
         init() {
-            // this.dummy_render();
-            // this.FEProxy.init(this.dummy_render);
             this.FEProxy.fetchConfig(this.configure);
             this.FEProxy.init(this.render);
-            // this.dummy_render();
-            // 
         },
     },
     mounted() {

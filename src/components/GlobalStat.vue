@@ -13,8 +13,8 @@
         /> -->
         <BarChart
         v-if="item == 'Bar'"
-        :width="400"
-        :height="330"
+        :width="barWidth"
+        :height="barHeight"
         :chartData="radarChartData"
         />
       </el-carousel-item>
@@ -61,7 +61,13 @@ export default {
       ...mapState({
         statistics: state => state.statistics,
         dongnutChartData: state => state.poi_statistics,
-      })
+      }),
+      barWidth() {
+        return 400;
+      },
+      barHeight() {
+        return 300;
+      },
     },
     watch: {
       statistics: {
@@ -74,7 +80,6 @@ export default {
     },
     methods: {
         render(data) {
-          console.log(data);
           let keys = Object.keys(data.index_detail);
           let values = Object.values(data.index_detail);
           let radarChartData = {

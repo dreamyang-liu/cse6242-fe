@@ -161,8 +161,12 @@ export default {
         }
     },
     computed: {
+      addedPoi_ids() {
+        return this.addedPois.map(poi => poi.id);
+      },
       ...mapState({
         cityData: state => state.cityData,
+        // demographics: state => state.demographics,
         pois: state => state.pois,
         clickEvent: state => state.clickEvent,
       })
@@ -181,7 +185,6 @@ export default {
         },
         addedPois: {
           handler(val) {
-            console.log(val);
             this.clearCatchment();
             this.update_layers('scatter');
           }
@@ -189,7 +192,7 @@ export default {
         cityData: {
           handler(val) {
             this.clearCatchment();
-            this.update_layers('hex');            
+            this.update_layers('hex');         
             let long = val.long;
             let lat = val.lat;
             let viewState = this.viewState;
@@ -205,6 +208,13 @@ export default {
           },
           deep: true
         },
+        // demographics: {
+        //   handler(val) {
+        //     this.clearCatchment();
+        //     this.update_layers('hex');            
+        //   },
+        //   deep: true
+        // },
         checkedDemographicTypes: {
           handler(val) {
             this.clearCatchment();
@@ -239,9 +249,12 @@ export default {
         update_pack.fill_config(this.$store.state.config);
         let proxy = new FEProxy();
         proxy.updateConfig((data)=> {
-          this.$store.commit("setStatistics", data.stats);
+          if(data.stats !== null)
+            this.$store.commit("setStatistics", data.stats);
           if(data.pois !== null)
             this.$store.commit("setPois", data.pois.data);
+          if(data.demographics !== null)
+            this.$store.commit("setDemographics", data.demographics);
         }
         , update_pack);
       },
@@ -434,6 +447,7 @@ export default {
           getRadius: d => 4,
           getFillColor: d => {
               if(this.picked_poi_id === d.id) return [0,255,255];
+              if(this.addedPoi_ids.indexOf(d.id) != -1) return [255,0,0];
               return [170,10,217];
           },
           updateTriggers: {
