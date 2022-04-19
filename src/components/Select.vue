@@ -78,7 +78,8 @@ export default {
             // this.$store.commit("reset");
             // this.$store.commit("setConfigCity", val);
             let proxy = new FEProxy();
-            console.log(this.$store.state.config);
+            console.log("Switching city");
+            this.$store.commit("clearPOIChanges");
             proxy.switchCity(val, this.update_callback, this.$store.state.config);
         },
         radio(val) {

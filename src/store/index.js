@@ -15,6 +15,8 @@ export default new Vuex.Store({
     cityData: {},
     cityList: {},
     demographics:{},
+    poisAdded: [],
+    poisRemoved: [],
     clickEvent: 0,
     statistics: {},
     poi_statistics:{
@@ -34,12 +36,17 @@ export default new Vuex.Store({
     setPois(state, pois) {
       state.pois = pois;
     },
-    addPoi(state, poi) {
-      state.pois.push(poi); 
-    }, 
-    deletePoi(state, id) {
-      state.pois = state.pois.filter(poi => poi.id !== id);
+    clearPOIChanges(state) {
+        state.poisAdded = []
+        state.poisRemoved = []
     },
+    addPOI(state, poi) {
+        state.poisAdded.push(poi)
+    },
+    removePOI(state, h3id) {
+        state.poisRemoved.push(h3id)
+        state.poisAdded = state.poisAdded.filter(val => val.h3id != h3id)
+    },    
     setConfig(state, config) {
       state.config = config;
     },
