@@ -43,6 +43,7 @@
 // import Radar from './charts/Radar.vue';
 import BarChart from './charts/BarChart.vue';
 import DoughnutChart from './charts/Doughnut.vue';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { mapState } from 'vuex';
 export default {
@@ -86,7 +87,7 @@ export default {
             labels: [...keys],
             datasets: [
               {
-                label: 'City Level Accessibilty Score',
+                label: 'City Level Accessibility Score',
                 backgroundColor: '#f67019',
                 borderColor: '#f67019',
                 pointBackgroundColor: '#f67019',
@@ -94,8 +95,8 @@ export default {
                 pointHoverBackgroundColor: '#f0f',
                 pointHoverBorderColor: '#f67019',
                 data: values
-              }
-            ]
+              }            
+            ]            
           }
           this.radarChartData = radarChartData;
         }
