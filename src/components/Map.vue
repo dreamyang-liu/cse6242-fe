@@ -89,7 +89,7 @@ export default {
             ICON_MAPPING: {
               marker: {x: 0, y: 0, width: 128, height: 128, mask: true}
             },
-            checkedPOITypes: "Vaccination centre",
+            checkedPOITypes: "Vaccination centers",
             checkedDemographicTypes: ['Race', 'all'],
             checkTimeTypes: [],
             data: null,
