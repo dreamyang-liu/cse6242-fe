@@ -48,14 +48,7 @@ export default {
         render(data) {
             this.$store.commit("setCityData", data);
             this.$store.commit("setPois", data.pois.data);
-            this.$store.commit("setStatistics", data.stats);
-            let newConfig = {
-              city_id: this.value,
-              poi_category: "Vaccination centre",
-              demographic_category: "Race",
-              time_of_day: "morning",
-            };
-            this.$store.commit("setConfig", newConfig);
+            this.$store.commit("setStatistics", data.stats);            
         },
         update_callback(cityData) {
           this.render(cityData);
