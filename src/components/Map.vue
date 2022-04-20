@@ -217,7 +217,7 @@ export default {
             this.clearCatchment();
             if(val[0] === this.$store.state.config.demographic_category) return;
             this.$store.commit('setConfigDemographicType', val[0]);
-            this.commit_config_change("demographic_category");
+            this.commit_config_change(["demographic_category"]);
             this.update_layers('hex');
           },
           deep: true
@@ -226,7 +226,7 @@ export default {
           handler(val) {
             this.clearCatchment();
             this.$store.commit('setConfigTimeofDay', val);
-            this.commit_config_change("time_of_day");
+            this.commit_config_change(["time_of_day", "demographic_category"]);
           },
           deep: true
         },
@@ -235,7 +235,10 @@ export default {
             this.clearCatchment();
             this.$store.commit('setConfigPOIType', val);
             this.$store.commit("clearPOIChanges");
-            this.commit_config_change("poi_category");
+            let arr_changes = ["poi_category", "demographic_category"]
+            this.commit_config_change(arr_changes);
+            // this.commit_config_change("poi_category");
+            // this.commit_config_change("demographic_category");
           },
           deep: true
         },
@@ -243,7 +246,11 @@ export default {
     methods: {
       commit_config_change(change_field) {
         let update_pack = new UpdatePack();
-        update_pack.add_change(change_field);
+
+        for (var i = 0; i < change_field.length; i ++) {
+          update_pack.add_change(change_field[i]);
+        }
+
         update_pack.fill_config(this.$store.state.config);
         let proxy = new FEProxy();
         proxy.updateConfig((data)=> {
@@ -397,14 +404,22 @@ export default {
             getPolygon: d => d,
             opacity: 0.5,
             // getElevation: d => d.population / d.area / 10,
-            getFillColor: d => [ 60, 140, 0],
+            getFillColor: d => [60, 140, 0],
             getLineColor: [80, 80, 80],
             getLineWidth: 1,
           });
         return layer;
       },
       createHexagonLayer() {
-        let data = this.cityData.demographics.data.filter(d => d.total > 0);
+        let factor_mean = 0;
+        for (var i = 0; i < this.cityData.demographics.data.length; i++) {
+          let elem = this.cityData.demographics.data[i];
+          factor_mean = factor_mean + elem.accessibility;
+        }
+
+        factor_mean = factor_mean / this.cityData.demographics.data.length;
+
+        let data = this.cityData.demographics.data.filter(d => d.accessibility > 0);
         let hexagonLayer = new H3HexagonLayer({
           id: 'heatmap',
           data,
@@ -416,15 +431,15 @@ export default {
           pickable: true,
           getHexagon: d=> d.h3id,
           getFillColor: d => {
-            let factor = [600, 100, 100, 50, 50, 10];
-            if(this.hex_set.has(d.h3id)) return [0,255,0];
+            // let factor = [5, 5, 5, 5, 5, 5];
+            if(this.hex_set.has(d.h3id)) return [0, 0, 0];
 
-            if(this.checkedDemographicTypes.indexOf('white') != -1){return [255,255-(d.data['White']/factor[1]) * 255,0];}
-            if(this.checkedDemographicTypes.indexOf('black') != -1){return [255,255-(d.data['Black or African American']/factor[2]) * 255,0];}
-            if(this.checkedDemographicTypes.indexOf('asian') != -1){return [255,255-(d.data['Asian']/factor[3]) * 255,0];}
-            if(this.checkedDemographicTypes.indexOf('native') != -1){return [255,255-(d.data['American Indian and Alaska Native']/factor[4]) * 255,0];}
-            if(this.checkedDemographicTypes.indexOf('hawaiian') != -1){return [255,255-(d.data['Native Hawaiian and Other Pacific Islander']/factor[5]) * 255,0];}
-            return [255,255-(d.total/factor[0]) * 255,0];
+            // if(this.checkedDemographicTypes.indexOf('white') != -1){return [255,255-(d.data['White']/factor[1]) * 255,0];}
+            // if(this.checkedDemographicTypes.indexOf('black') != -1){return [255,255-(d.data['Black or African American']/factor[2]) * 255,0];}
+            // if(this.checkedDemographicTypes.indexOf('asian') != -1){return [255,255-(d.data['Asian']/factor[3]) * 255,0];}
+            // if(this.checkedDemographicTypes.indexOf('native') != -1){return [255,255-(d.data['American Indian and Alaska Native']/factor[4]) * 255,0];}
+            // if(this.checkedDemographicTypes.indexOf('hawaiian') != -1){return [255,255-(d.data['Native Hawaiian and Other Pacific Islander']/factor[5]) * 255,0];}
+            return [170, (d.accessibility/ (2 * factor_mean)) * 255, 0];
             
           },
           // updateTriggers: {
