@@ -245,6 +245,10 @@ export default {
         let update_pack = new UpdatePack();
         update_pack.add_change(change_field);
         update_pack.fill_config(this.$store.state.config);
+        update_pack.fill_poi_list({
+            "added": this.$store.state.poisAdded.map(val => val.h3id),
+            "deleted": this.$store.state.poisRemoved
+        });
         let proxy = new FEProxy();
         proxy.updateConfig((data)=> {
           if(data.stats !== null)
