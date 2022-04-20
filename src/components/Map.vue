@@ -423,7 +423,7 @@ export default {
 
         factor_mean = factor_mean / this.cityData.demographics.data.length;
 
-        let data = this.cityData.demographics.data.filter(d => d.accessibility > 0);
+        let data = this.cityData.demographics.data.filter(d => d.total > 0);
         let hexagonLayer = new H3HexagonLayer({
           id: 'heatmap',
           data,
