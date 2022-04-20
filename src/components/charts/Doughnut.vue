@@ -78,7 +78,14 @@ export default {
       // },
       chartOptions: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+            datalabels: {
+                formatter: (value, context) => {
+                    return ""                    
+                }
+            }
+        }
       }
     }
   }

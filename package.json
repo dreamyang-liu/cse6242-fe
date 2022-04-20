@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "chart.js": "^3.7.1",
+    "chartjs-plugin-datalabels": "^2.0.0",
     "core-js": "^3.6.5",
     "d3": "^5.0.0",
     "deck.gl": "^8.7.0",

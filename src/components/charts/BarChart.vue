@@ -15,9 +15,11 @@
 <script>
 import { Bar } from 'vue-chartjs/legacy'
 // import { Bar } from 'vue-chartjs'
+
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ChartDataLabels)
 
 export default {
   name: 'BarChart',
@@ -49,8 +51,15 @@ export default {
     },
     plugins: {
       type: Object,
-      default: () => {}
-    },
+      default: () => {
+          datalabels: {
+            formatter: (value, context) => {
+                console.log("Rounding");
+                return Math.round(value, 2);
+            }
+        }
+      }
+    }, 
     chartData: {
       type: Object,
       default: () => {
@@ -59,16 +68,23 @@ export default {
             datasets: [ { data: [40, 20, 12, 15, 18, 30, 24] } ]
           }
       }
-    },
+    }    
   },
   data() {
     return {
       chartOptions: {
         indexAxis: 'y',
         responsive: true,
-        maintainAspectRatio: false
-      }
+        maintainAspectRatio: false,
+        plugins: {
+            datalabels: {
+                formatter: (value, context) => {                    
+                    return value.toFixed(3)
+                }
+            }
+        }
     }
   }
+}
 }
 </script>
