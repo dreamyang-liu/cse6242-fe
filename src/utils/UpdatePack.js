@@ -4,7 +4,7 @@ class UpdatePack {
             "changed": [
             ],
             "config": {
-              "poi_category": "Vaccination centre",
+              "poi_category": "Vaccination centers",
               "demographic_category": "Race",
               "time_of_day": "morning",
               "city_id": 1
