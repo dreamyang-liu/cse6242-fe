@@ -112,9 +112,7 @@ export default {
             coverage: 1.0,
             opacity: 0.2,
             hex_set: new Set(),
-            time_of_day: 'morning',
-            addedPois: [],
-            deletedPois: [],
+            time_of_day: 'morning',            
             options: [
             {
               value: 'Race',
@@ -160,15 +158,13 @@ export default {
             ],
         }
     },
-    computed: {
-      addedPoi_ids() {
-        return this.addedPois.map(poi => poi.id);
-      },
+    computed: {      
       ...mapState({
         cityData: state => state.cityData,
         // demographics: state => state.demographics,
         pois: state => state.pois,
         clickEvent: state => state.clickEvent,
+        addedPois: state => state.poisAdded        
       })
     },
     watch: {
@@ -187,6 +183,7 @@ export default {
           handler(val) {
             this.clearCatchment();
             this.update_layers('scatter');
+            console.log("AddedPOIs triggered");
           }
         },
         cityData: {
@@ -237,6 +234,7 @@ export default {
           handler(val) {
             this.clearCatchment();
             this.$store.commit('setConfigPOIType', val);
+            this.$store.commit("clearPOIChanges");
             this.commit_config_change("poi_category");
           },
           deep: true
@@ -314,17 +312,26 @@ export default {
         }
       },
       handleAddPOI(val) {
-        if(this.clickEvent === 1) {
-          console.log(val);
+        if(this.clickEvent === 1) {          
           if(val.info.layer.id === 'heatmap') {
-            let new_poi = {'long': val.info.coordinate[0], 'lat': val.info.coordinate[1], 'name':`Unknown ${this.checkedPOITypes}`,'h3id':h3.geoToH3(val.info.coordinate[1], val.info.coordinate[0], 9),'id':-1 + -1 * this.addedPois.length,'category':this.checkedPOITypes,'coords':{'lat':val.info.coordinate[1],'long':val.info.coordinate[0]}};
-            this.addedPois.push(new_poi);
+            let new_poi = {
+                'long': val.info.coordinate[0], 
+                'lat': val.info.coordinate[1], 
+                'name':`Unknown ${this.checkedPOITypes}`,
+                'h3id':h3.geoToH3(val.info.coordinate[1], val.info.coordinate[0], 9),
+                'id':-1 + -1 * this.addedPois.length,
+                'category':this.checkedPOITypes,
+                'coords':{'lat':val.info.coordinate[1],'long':val.info.coordinate[0]},
+                'fake': true
+            };
+            this.$store.commit("addPOI", new_poi);  
+            console.log(this.$store.state.poisAdded)          
             let update_pack = new UpdatePack();
             update_pack.add_change("poi_add");
             update_pack.fill_config(this.$store.state.config);
             update_pack.fill_poi_list({
-              "added": this.addedPois.map(val => val.h3id),
-              "deleted": this.deletedPois
+              "added": this.$store.state.poisAdded.map(val => val.h3id),
+              "deleted": this.$store.state.poisRemoved
             });
             let proxy = new FEProxy();
             proxy.updateConfig((data)=> {
@@ -344,13 +351,13 @@ export default {
             this.notify("Remove POI Failed", "Cannot remove an unexisting POI", false);
           } else {
             // this.$store.commit("deletePoi", val.info.object.id);
-            this.deletedPois.push(val.info.object.h3id);
+            this.$store.commit("removePOI", val.info.object.h3id);            
             let update_pack = new UpdatePack();
             update_pack.add_change("poi_remove");
             update_pack.fill_config(this.$store.state.config);
             update_pack.fill_poi_list({
-              "added": this.addedPois.map(val => val.h3id),
-              "deleted": this.deletedPois
+              "added": this.$store.state.poisAdded.map(val => val.h3id),
+              "deleted": this.$store.state.poisRemoved
             });            
             let proxy = new FEProxy();
             proxy.updateConfig((data)=> {
@@ -432,7 +439,7 @@ export default {
         console.log("Redrawing the layer of Scatter...");
         let layer = new ScatterplotLayer({
           id: 'scatterplot-layer',
-          data: [...this.pois, ...this.addedPois],
+          data: [...this.pois, ...this.$store.state.poisAdded],
           pickable: true,
           opacity: 0.8,
           stroked: true,
@@ -447,7 +454,7 @@ export default {
           getRadius: d => 4,
           getFillColor: d => {
               if(this.picked_poi_id === d.id) return [0,255,255];
-              if(this.addedPoi_ids.indexOf(d.id) != -1) return [255,0,0];
+              if(d.fake) return [255,0,0];
               return [170,10,217];
           },
           updateTriggers: {

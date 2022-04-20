@@ -48,14 +48,7 @@ export default {
         render(data) {
             this.$store.commit("setCityData", data);
             this.$store.commit("setPois", data.pois.data);
-            this.$store.commit("setStatistics", data.stats);
-            let newConfig = {
-              city_id: this.value,
-              poi_category: "Vaccination centre",
-              demographic_category: "Race",
-              time_of_day: "morning",
-            };
-            this.$store.commit("setConfig", newConfig);
+            this.$store.commit("setStatistics", data.stats);            
         },
         update_callback(cityData) {
           this.render(cityData);
@@ -78,7 +71,8 @@ export default {
             // this.$store.commit("reset");
             // this.$store.commit("setConfigCity", val);
             let proxy = new FEProxy();
-            console.log(this.$store.state.config);
+            console.log("Switching city");
+            this.$store.commit("clearPOIChanges");
             proxy.switchCity(val, this.update_callback, this.$store.state.config);
         },
         radio(val) {
