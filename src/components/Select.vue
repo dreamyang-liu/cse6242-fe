@@ -20,8 +20,12 @@
         <el-dialog
         title="Methodology"
         :visible.sync="dialogVisible"
-        width="30%">
-        <span>This is the methodology of the tool</span>
+        width="42%">
+        <p class="method">We employed a <strong>custom, Dockerized travel time isochrone service </strong>based on OpenTripPlanner which computes accurate isochrones based on supplied GTFS and OSM data.</p>
+        <p class="method">We also created a normalized dataset with <strong>GeoPandas</strong> and Uber’s <strong>H3 hexagons</strong> being the atomic unit of location. The mapping is done by finding the hex which overlaps with a given POI. The area of each hex was set to be ~0.1 km2.</p>
+        <p class="method">Isochrones were combined with the Census data to compute the accessibility index using the <strong>2SFCA</strong> method – an interpretable gravity model</p>
+        <p class="method">All the data was stored in a <strong>PostgreSQL</strong> database and cached using <strong>Redis</strong> for low-latency querying.</p>
+        <p class="method">The tool was developed with <strong>FastAPI, Vue.js,</strong> and the <strong>Deck.GL</strong> mapping library was used to display the interactive visualization on the H3 hexagon scale. City and catchment level statistics were displayed using <strong>Chart.js</strong> and drew from the PostgreSQL backend.</p>
         <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="dialogVisible = false">Done</el-button>
         </span>
@@ -92,5 +96,9 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.method {
+  word-wrap:break-word;
+  word-break:normal;
 }
 </style>
