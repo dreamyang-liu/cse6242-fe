@@ -27,7 +27,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## Nginx configuration 
 
-For a guide on how to setup Nginx reverse proxy, see https://phoenixnap.com/kb/nginx-reverse-proxy.
+For a guide on how to setup Nginx reverse proxy, see https://phoenixnap.com/kb/nginx-reverse-proxy
 
 You will need the following setup in the nginx.conf (or equivalent) file:
 
